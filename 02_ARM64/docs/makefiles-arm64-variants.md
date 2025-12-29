@@ -1,8 +1,9 @@
 # Makefiles ARM64: QEMU en host x86 vs. variantes nativas
+Última revisión: 2025-03-17
 
-## Objetivo
+## Propósito
 
-Dejar en un solo lugar las copias de los Makefiles actuales (pensados para host x86 + QEMU user-mode) y sus variantes para ejecutarse directamente en una máquina **AArch64 nativa** sin QEMU. Incluye notas de uso y diferencias clave.
+Reunir en un solo lugar las copias de los Makefiles actuales (host x86 + QEMU user-mode) y sus variantes para ejecutarse directamente en una máquina **AArch64 nativa** sin QEMU, con enfoque didáctico y comparativas rápidas.
 
 ---
 
@@ -13,6 +14,17 @@ Dejar en un solo lugar las copias de los Makefiles actuales (pensados para host 
 - `make gdb`: lanza depuración. En x86 arranca QEMU con stub GDB en `localhost:1234`; en ARM64 abre `gdb` local sobre el binario.
 - `make clean`: borra el directorio `build/`.
 - `make info`: muestra un resumen de los targets disponibles.
+
+---
+
+## ¿Qué flujo usar? (resumen comparativo)
+
+| Flujo           | Ejecución           | Depuración                | Toolchain                      | Cuándo elegirlo                     |
+|-----------------|---------------------|---------------------------|--------------------------------|-------------------------------------|
+| Host x86 + QEMU | `qemu-aarch64`      | Stub GDB `localhost:1234` | `aarch64-linux-gnu-*`, `gdb-multiarch` | No hay hardware ARM disponible      |
+| Raspberry Pi    | Ejecución directa   | `gdb` local o remoto SSH  | `as`, `ld`, `gdb`              | Hay hardware ARM64 (nativo)         |
+
+Lectura recomendada: estudiantes revisan las secciones 0–3; instructores deben leer también las diferencias y notas de uso.
 
 ---
 
@@ -415,3 +427,19 @@ info:
 
 - En host x86: usa los Makefiles originales (secciones 1.1 y 1.2) para construir/ejecutar con QEMU y depurar con VS Code mediante GDB remoto.
 - En host ARM64: cambia el Makefile por su variante nativa (2.1 o 2.2) o guárdalo como `Makefile.native` para alternar; ejecuta `make`, `make run` y `make gdb` sin QEMU.
+
+## 5. Notas pedagógicas y checklist
+
+- Estudiantes: replica siempre los comandos `make`, verifica que `build/main` tenga símbolos (`file build/main | grep debug`), practica breakpoints y `info registers`.
+- Instructores: antes de clase valida ambos flujos (QEMU y nativo si hay Pi disponible) y deja preparado `launch.json` acorde al escenario (con o sin `miDebuggerServerAddress`).
+- Checklist rápido:
+  - `make` genera binario en `build/`.
+  - `make run` produce la salida esperada.
+  - `make gdb` conecta (QEMU) o lanza `gdb` (nativo).
+  - `make clean` limpia `build/`.
+
+## 6. Errores comunes
+
+- Ejecutar `make run` en x86 sin QEMU instalado: instala `qemu-aarch64` o usa el flujo nativo solo en ARM64.
+- Breakpoints que no enganchan con QEMU: confirma `set breakpoint auto-hw on` y que `sourceFileMap` coincida (ver `docs/debugging-aarch64-vscode.md`).
+- En nativo, usar la toolchain cruzada en vez de la nativa: sustituye `aarch64-linux-gnu-*` por `as/ld` si estás en Raspberry Pi.

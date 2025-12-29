@@ -1,4 +1,19 @@
 # Depuración de programas AArch64 (ARM64) en host x86 mediante QEMU y Visual Studio Code
+Última revisión: 2025-03-17
+
+## Objetivos de la guía
+
+- Configurar depuración con VS Code para dos escenarios: Raspberry Pi (ARM64) y host x86 con QEMU.
+- Reutilizar las mismas fuentes y Makefiles sin cambios.
+- Practicar inspección de registros, memoria y breakpoints en ensamblador.
+
+## Resumen rápido de flujos de depuración
+
+| Escenario          | Ejecución                 | Conexión GDB                     | Uso típico en VS Code          |
+|--------------------|---------------------------|----------------------------------|--------------------------------|
+| Raspberry Pi local | `./build/main`            | `gdb build/main`                 | `cppdbg` local (`program`, `cwd`) |
+| Raspberry Pi por SSH| `./build/main` vía SSH    | `gdb` remoto (`gdbserver` opcional) | `cppdbg` con `pipeTransport` (SSH) |
+| Host x86 + QEMU    | `qemu-aarch64 -g 1234 …`  | Stub GDB `localhost:1234`        | `cppdbg` con `miDebuggerServerAddress` |
 
 ## 1. Objetivo
 
@@ -208,6 +223,11 @@ El archivo `.vscode/launch.json` define una única configuración `Debug ARM64 (
 - **Breakpoints en cualquier archivo:** activa `Debug: Allow Breakpoints Everywhere` (`debug.allowBreakpointsEverywhere: true`) desde `Settings` o `settings.json` para poder fijar breakpoints en archivos `.s`.
 - **MemoryView:** la extensión agrega el comando *MemoryView: Toggle Memory View for Debugger* accesible con `F1` durante una sesión de depuración.
 
+### 10.2 Modos de uso en Raspberry Pi
+
+- **Local (Pi):** ejecuta `make gdb` (o `gdb build/main`), usa la misma configuración `cppdbg` pero sin `miDebuggerServerAddress` (depuración directa).
+- **Remoto (SSH desde VS Code):** conecta VS Code vía SSH, o usa `pipeTransport` en `launch.json` para tunelar `gdb`/`gdbserver`. El binario sigue siendo `build/main` y no requiere QEMU.
+
 ---
 
 ## 11. Automatización con Makefile
@@ -254,6 +274,20 @@ sequenceDiagram
     G->>Q: Control de ejecución
 ```
 
+### 12.3 Flujo de depuración remota en Raspberry Pi (SSH + gdbserver opcional)
+
+```mermaid
+sequenceDiagram
+    participant U as Usuario (VS Code)
+    participant S as SSH/pipeTransport
+    participant P as Raspberry Pi (gdb/gdbserver)
+
+    U->>S: Inicia sesión SSH (o usa pipeTransport)
+    U->>P: Lanza depuración (gdb o gdbserver)
+    U->>P: Enviar comandos de depuración (break, step, mem)
+    P->>U: Respuestas (estado, registros, memoria)
+```
+
 ---
 
 ## 13. Procedimiento de uso
@@ -265,6 +299,21 @@ sequenceDiagram
 5. **Iniciar depuración en VS Code:** Configuración `Debug ARM64 (QEMU)` → selecciona la misma lección cuando lo solicite → pulsa **F5**.
 6. **Ver memoria con MemoryView:** con la ejecución **detenida** (breakpoint o paso a paso), presiona `F1` y elige `MemoryView: Toggle Memory View for Debugger`; define dirección y tamaño a observar.
 7. Depura con breakpoints, inspección de registros/memoria y paso a paso. Para ejecución directa sin depurar, usa `make run`.
+
+### Checklist de verificación rápida
+
+- El binario se generó en `build/main` con símbolos (`-g`).
+- VS Code muestra breakpoints activos en `.s`.
+- MemoryView abre y muestra la región esperada.
+- En QEMU: el stub escucha en `localhost:1234` y GDB se conecta.
+- En Raspberry Pi: `gdb` local o remoto responde a `info registers`.
+
+### Errores comunes y mitigaciones
+
+- QEMU no responde en `1234`: confirma que `make gdb` sigue activo y no hay otro proceso usando el puerto.
+- Breakpoints que no se activan: verifica `debug.allowBreakpointsEverywhere` y que las rutas coincidan (`sourceFileMap`).
+- Memoria inaccesible en MemoryView: usa direcciones válidas (RAM, pila) y tamaños pequeños al inicio.
+- En SSH: latencias altas pueden causar timeouts; reduce el número de paquetes de símbolos o usa `gdbserver` con opciones mínimas.
 
 ---
 
