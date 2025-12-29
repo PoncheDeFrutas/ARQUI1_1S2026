@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "inputs": [
+        {
+            "id": "lesson",
+            "type": "pickString",
+            "description": "Seleccione la lección",
+            "options": [
+                "00_hello_world",
+                "99_test"
+            ]
+        }
+    ],
+    "configurations": [
+        {
+            "name": "Debug ARM64 (QEMU)",
+            "type": "cppdbg",
+            "request": "launch",
+
+            "program": "${workspaceFolder}/lessons/${input:lesson}/build/main",
+            "cwd": "${workspaceFolder}/lessons/${input:lesson}",
+
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb-multiarch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "stopAtEntry": true,
+
+            "setupCommands": [
+                {
+                    "description": "Enable pretty printing",
+                    "text": "-enable-pretty-printing"
+                },
+                {
+                    "description": "Set architecture",
+                    "text": "set architecture aarch64"
+                }
+            ]
+        }
+    ]
+}

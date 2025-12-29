@@ -1,0 +1,253 @@
+# Depuración de programas AArch64 (ARM64) en host x86 mediante QEMU y Visual Studio Code
+
+## 1. Objetivo
+
+Configurar un entorno **reproducible y académico** para la **construcción, ejecución y depuración** de programas AArch64 (ARM64) escritos en ensamblador, usando un **host x86 con Linux**, **QEMU en modo usuario** y **depuración remota con GDB integrada en Visual Studio Code**. El flujo soporta múltiples lecciones, cada una con su propio Makefile y binario.
+
+---
+
+## 2. Alcance
+
+- Programas escritos en **ensamblador AArch64**
+- Binarios **Linux ARM64** (ELF)
+- Ejecución mediante **QEMU user-mode**
+- Depuración remota con **GDB multi-arquitectura**
+- Interfaz gráfica de depuración mediante **Visual Studio Code**
+
+No se utiliza libc ni funciones de alto nivel; el código interactúa directamente con el kernel Linux mediante **syscalls**.
+
+---
+
+## 3. Requisitos del sistema
+
+### 3.1 Sistema operativo anfitrión
+
+- Linux x86_64 (probado en Debian/Ubuntu)
+
+### 3.2 Herramientas en Linux
+
+Instale las siguientes herramientas en el sistema anfitrión:
+
+- **aarch64-linux-gnu-as**  
+  Ensamblador cruzado para la arquitectura AArch64.
+
+- **aarch64-linux-gnu-ld**  
+  Enlazador cruzado para generar ejecutables ELF ARM64.
+
+- **qemu-aarch64**  
+  Emulador de binarios ARM64 en modo usuario.
+
+- **gdb-multiarch**  
+  Depurador GDB con soporte para múltiples arquitecturas, incluyendo AArch64.
+
+#### Instalación típica (Debian/Ubuntu)
+
+```bash
+sudo apt update
+sudo apt install -y binutils-aarch64-linux-gnu qemu-user gdb-multiarch
+```
+
+---
+
+## 4. Herramientas de desarrollo
+
+### 4.1 Visual Studio Code
+
+Visual Studio Code se utiliza como entorno de desarrollo y **frontend gráfico del depurador**.
+
+### 4.2 Extensión requerida
+
+- **C/C++ (Microsoft)**
+
+Esta extensión proporciona el depurador `cppdbg`, que permite a VS Code actuar como **cliente GDB remoto**.
+
+---
+
+## 5. Estructura del proyecto (ejemplo)
+
+```text
+project-root/
+├── lessons/
+│   ├── 00_hello_world/
+│   │   ├── main.s
+│   │   ├── Makefile            # flujo mínimo (un solo fuente)
+│   │   └── build/
+│   └── 99_test/
+│       ├── main.s
+│       ├── add.s
+│       ├── Makefile            # flujo multi-fuente
+│       └── build/
+├── .vscode/
+│   └── launch.json
+└── docs/
+    └── debugging-aarch64-vscode.md
+```
+
+---
+
+## 6. Proceso de construcción (resumen)
+
+1. Ensamblado de los `.s` a objetos ELF (`.o`) con símbolos de depuración (`-g`).
+2. Enlazado de los objetos para generar un ejecutable ELF ARM64 (`build/main`).
+3. Los dos Makefiles mantienen esta secuencia; difieren en el alcance de fuentes y automatización (ver sección 7).
+
+---
+
+## 7. Makefiles disponibles
+
+### 7.1 `lessons/00_hello_world/Makefile`
+
+- **Propósito:** flujo mínimo para la lección de arranque; asume un único archivo `main.s`.
+- **Flujo:** ensambla `main.s` → `build/main.o`, enlaza a `build/main`; comandos explícitos y fáciles de seguir.
+- **Pros:** ideal para explicar el pipeline básico; Makefile corto y legible; menos sorpresas.
+- **Contras:** no maneja múltiples fuentes; si agregas otro `.s` debes editar reglas a mano.
+- **Comandos clave:** `make`, `make run`, `make gdb`, `make clean`, `make info`.
+
+### 7.2 `lessons/99_test/Makefile`
+
+- **Propósito:** laboratorio más flexible; compila **todos** los `.s` del directorio (requiere que el punto de entrada sea `main.s`).
+- **Flujo:** detecta automáticamente fuentes auxiliares (`wildcard`), genera objetos en `build/` y enlaza a `build/main`.
+- **Pros:** permite modularizar ejercicios en varios archivos sin tocar el Makefile; mantiene mismos comandos que la lección 00.
+- **Contras:** compila todos los `.s` del directorio (no hay selección parcial); depende de que `main.s` exista y defina `_start`.
+- **Comandos clave:** `make`, `make run`, `make gdb`, `make clean`, `make info`.
+
+Use la lección que necesite (00 para el flujo más sencillo, 99 para experimentos multi-fuente) y ejecute los comandos **desde la carpeta de la lección**.
+
+---
+
+## 8. Ejecución mediante QEMU
+
+El ejecutable ARM64 se ejecuta en un host x86 con **QEMU en modo usuario**:
+
+- QEMU traduce dinámicamente instrucciones AArch64 a x86_64.
+- No se emula un sistema completo, solo el proceso de usuario.
+
+---
+
+## 9. Depuración remota con QEMU y GDB
+
+### 9.1 GDB stub de QEMU
+
+QEMU puede iniciarse en modo depuración exponiendo un **servidor GDB remoto**:
+
+```bash
+qemu-aarch64 -g 1234 build/main
+```
+
+En este modo:
+- El programa se inicia pausado.
+- QEMU espera una conexión GDB en `localhost:1234`.
+
+### 9.2 Cliente GDB
+
+La depuración se realiza mediante **gdb-multiarch**, el cual:
+
+- Se conecta al servidor GDB de QEMU.
+- Entiende la arquitectura AArch64.
+- Permite inspeccionar registros, memoria y flujo de ejecución.
+
+En este proyecto, **gdb-multiarch es invocado por Visual Studio Code**, no directamente desde el Makefile.
+
+---
+
+## 10. Integración con Visual Studio Code
+
+El archivo `.vscode/launch.json` define una única configuración `Debug ARM64 (QEMU)` que reutiliza GDB remoto:
+
+```json
+{
+    "inputs": [
+        {
+            "id": "lesson",
+            "type": "pickString",
+            "description": "Seleccione la lección",
+            "options": ["00_hello_world", "99_test"]
+        }
+    ],
+    "configurations": [
+        {
+            "name": "Debug ARM64 (QEMU)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/lessons/${input:lesson}/build/main",
+            "cwd": "${workspaceFolder}/lessons/${input:lesson}",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb-multiarch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "stopAtEntry": true,
+            "setupCommands": [
+                {"description": "Enable pretty printing", "text": "-enable-pretty-printing"},
+                {"description": "Set architecture", "text": "set architecture aarch64"}
+            ]
+        }
+    ]
+}
+```
+
+- Al presionar **F5**, VS Code pedirá seleccionar la lección (`00_hello_world` o `99_test`); usa la misma lección donde corriste `make gdb`.
+- `program` y `cwd` se recalculan según la lección elegida, por lo que no necesitas duplicar configuraciones.
+- GDB se conecta al stub de QEMU en `localhost:1234`, así que la terminal donde ejecutaste `make gdb` debe permanecer abierta.
+
+---
+
+## 11. Automatización con Makefile
+
+Ambos Makefiles ofrecen los mismos objetivos:
+
+- `make` : Ensambla y enlaza el programa ARM64.
+- `make run` : Ejecuta el binario mediante QEMU.
+- `make gdb` : Inicia QEMU en modo depuración (servidor GDB en 1234).
+- `make clean` : Limpia `build/`.
+- `make info` : Lista los objetivos disponibles.
+
+---
+
+## 12. Flujo general del sistema
+
+### 12.1 Flujo de construcción y ejecución
+
+```mermaid
+flowchart TD
+    A[main.s<br/>AArch64 Assembly] --> B[aarch64-linux-gnu-as -g]
+    B --> C[main.o<br/>ELF Object]
+    C --> D[aarch64-linux-gnu-ld]
+    D --> E[main<br/>ELF ARM64]
+    E --> F[qemu-aarch64]
+```
+
+### 12.2 Flujo de depuración remota
+
+```mermaid
+sequenceDiagram
+    participant U as Usuario
+    participant M as Makefile
+    participant Q as QEMU (GDB Stub)
+    participant V as VS Code
+    participant G as gdb-multiarch
+
+    U->>M: make gdb
+    M->>Q: Ejecuta binario ARM64 (-g 1234)
+    U->>V: Iniciar depuración (F5)
+    V->>G: Ejecuta gdb-multiarch
+    G->>Q: Conexión remota localhost:1234
+    V->>G: Comandos de depuración
+    G->>Q: Control de ejecución
+```
+
+---
+
+## 13. Procedimiento de uso
+
+1. **Elegir la lección** y entrar a su carpeta: `cd lessons/<leccion>`.
+2. **Compilar** el programa: `make`.
+3. **Modo depuración:** `make gdb` (deja la terminal abierta; QEMU queda esperando en `1234`).
+4. **Iniciar depuración en VS Code:** Configuración `Debug ARM64 (QEMU)` → selecciona la misma lección cuando lo solicite → pulsa **F5**.
+5. Depura con puntos de quiebre, inspección de registros/memoria y paso a paso. Para ejecución directa sin depurar, usa `make run`.
+
+---
+
+## 14. Observaciones finales
+
+- El entorno separa claramente **construcción**, **emulación** y **depuración**, facilitando el análisis académico.
+- Selecciona `00_hello_world` cuando necesites el pipeline más explícito y simple; usa `99_test` para ejercicios con varios archivos fuente sin tocar el Makefile.
+- No se requiere hardware ARM físico; todo se ejecuta en un host x86 con QEMU.
