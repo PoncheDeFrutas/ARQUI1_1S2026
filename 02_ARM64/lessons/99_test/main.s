@@ -14,10 +14,10 @@ _start:
      * Preparar argumentos para sumar(a, b)
      * ----------------------------------------- */
     mov x0, #5      // a = 5
-    mov x1, #10      // b = 7
+    mov x1, #10     // b = 10
 
     bl sum          // llamada a la función
-                    // resultado queda en x0 (5 + 2 = 7)
+                    // resultado queda en x0 (5 + 10 = 15)
 
     /* -----------------------------------------
      * Finalizar el programa
