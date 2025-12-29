@@ -55,11 +55,11 @@ sudo apt install -y binutils-aarch64-linux-gnu qemu-user gdb-multiarch
 
 Visual Studio Code se utiliza como entorno de desarrollo y **frontend gráfico del depurador**.
 
-### 4.2 Extensión requerida
+### 4.2 Extensiones de VS Code
 
-- **C/C++ (Microsoft)**
-
-Esta extensión proporciona el depurador `cppdbg`, que permite a VS Code actuar como **cliente GDB remoto**.
+- **C/C++ (Microsoft):** habilita el depurador `cppdbg` para actuar como cliente GDB remoto.
+- **Assembly for ARM64:** resaltado y ayudas básicas para archivos `.s` de AArch64.
+- **MemoryView:** panel de memoria durante la depuración.
 
 ---
 
@@ -156,12 +156,16 @@ El archivo `.vscode/launch.json` define una única configuración `Debug ARM64 (
 
 ```json
 {
+    "version": "0.2.0",
     "inputs": [
         {
             "id": "lesson",
             "type": "pickString",
             "description": "Seleccione la lección",
-            "options": ["00_hello_world", "99_test"]
+            "options": [
+                "00_hello_world",
+                "99_test"
+            ]
         }
     ],
     "configurations": [
@@ -175,9 +179,19 @@ El archivo `.vscode/launch.json` define una única configuración `Debug ARM64 (
             "miDebuggerPath": "/usr/bin/gdb-multiarch",
             "miDebuggerServerAddress": "localhost:1234",
             "stopAtEntry": true,
+            "sourceFileMap": {
+                "${workspaceFolder}/lessons/${input:lesson}": "${workspaceFolder}/lessons/${input:lesson}"
+            },
             "setupCommands": [
-                {"description": "Enable pretty printing", "text": "-enable-pretty-printing"},
-                {"description": "Set architecture", "text": "set architecture aarch64"}
+                {
+                    "text": "-enable-pretty-printing"
+                },
+                {
+                    "text": "set architecture aarch64"
+                },
+                {
+                    "text": "set breakpoint auto-hw on"
+                }
             ]
         }
     ]
@@ -185,8 +199,14 @@ El archivo `.vscode/launch.json` define una única configuración `Debug ARM64 (
 ```
 
 - Al presionar **F5**, VS Code pedirá seleccionar la lección (`00_hello_world` o `99_test`); usa la misma lección donde corriste `make gdb`.
-- `program` y `cwd` se recalculan según la lección elegida, por lo que no necesitas duplicar configuraciones.
+- `sourceFileMap` mantiene la correspondencia de rutas dentro de la carpeta de la lección para que los breakpoints en `.s` coincidan con las rutas que ve GDB remoto.
+- `set breakpoint auto-hw on` fuerza breakpoints por hardware, útil cuando el código está en páginas de solo lectura.
 - GDB se conecta al stub de QEMU en `localhost:1234`, así que la terminal donde ejecutaste `make gdb` debe permanecer abierta.
+
+### 10.1 Ajustes recomendados en VS Code
+
+- **Breakpoints en cualquier archivo:** activa `Debug: Allow Breakpoints Everywhere` (`debug.allowBreakpointsEverywhere: true`) desde `Settings` o `settings.json` para poder fijar breakpoints en archivos `.s`.
+- **MemoryView:** la extensión agrega el comando *MemoryView: Toggle Memory View for Debugger* accesible con `F1` durante una sesión de depuración.
 
 ---
 
@@ -238,11 +258,13 @@ sequenceDiagram
 
 ## 13. Procedimiento de uso
 
-1. **Elegir la lección** y entrar a su carpeta: `cd lessons/<leccion>`.
-2. **Compilar** el programa: `make`.
-3. **Modo depuración:** `make gdb` (deja la terminal abierta; QEMU queda esperando en `1234`).
-4. **Iniciar depuración en VS Code:** Configuración `Debug ARM64 (QEMU)` → selecciona la misma lección cuando lo solicite → pulsa **F5**.
-5. Depura con puntos de quiebre, inspección de registros/memoria y paso a paso. Para ejecución directa sin depurar, usa `make run`.
+1. **Preparar VS Code:** instala las extensiones `C/C++`, `Assembly for ARM64` y `MemoryView`; habilita `Debug: Allow Breakpoints Everywhere` para poder fijar breakpoints en cualquier archivo.
+2. **Elegir la lección** y entrar a su carpeta: `cd lessons/<leccion>`.
+3. **Compilar** el programa: `make`.
+4. **Modo depuración:** `make gdb` (deja la terminal abierta; QEMU queda esperando en `1234`).
+5. **Iniciar depuración en VS Code:** Configuración `Debug ARM64 (QEMU)` → selecciona la misma lección cuando lo solicite → pulsa **F5**.
+6. **Ver memoria con MemoryView:** con la ejecución **detenida** (breakpoint o paso a paso), presiona `F1` y elige `MemoryView: Toggle Memory View for Debugger`; define dirección y tamaño a observar.
+7. Depura con breakpoints, inspección de registros/memoria y paso a paso. Para ejecución directa sin depurar, usa `make run`.
 
 ---
 
