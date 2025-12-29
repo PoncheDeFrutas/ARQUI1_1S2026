@@ -15,13 +15,13 @@ Cuando no haya hardware ARM, se trabaja con QEMU en host x86 sin cambiar las fue
 
 ## 2. Alcance actual
 
-✔ ARM64 user-mode sobre Linux  
-✔ Ensamblador GNU (GAS)  
-✔ Syscalls Linux  
-✔ Análisis de ejecución a bajo nivel  
-✘ No bare-metal  
-✘ No acceso directo a GPIO  
-✘ No RTOS / microcontroladores  
+✔ ARM64 user-mode sobre Linux
+✔ Ensamblador GNU (GAS)
+✔ Syscalls Linux
+✔ Análisis de ejecución a bajo nivel
+✘ No bare-metal
+✘ No acceso directo a GPIO
+✘ No RTOS / microcontroladores
 El acceso a hardware (GPIO/MMIO) se abordará en fases posteriores.
 
 ## 3. ¿Qué leer primero? (según rol)
@@ -71,12 +71,12 @@ El acceso a hardware (GPIO/MMIO) se abordará en fases posteriores.
 
 ## 8. Compilación y ejecución (visión general)
 
-Las mismas fuentes se ejecutan sin modificación tanto en Raspberry Pi como en QEMU.  
-- `make` (o `make all`): ensambla y enlaza con símbolos de depuración.  
-- `make run`: ejecuta el binario (nativo en Pi, emulado en x86).  
-- `make gdb`: depuración (local en Pi, GDB stub vía QEMU en x86).  
-- `make clean`: limpia `build/`.  
-- `make info`: muestra ayuda rápida.  
+Las mismas fuentes se ejecutan sin modificación tanto en Raspberry Pi como en QEMU.
+- `make` (o `make all`): ensambla y enlaza con símbolos de depuración.
+- `make run`: ejecuta el binario (nativo en Pi, emulado en x86).
+- `make gdb`: depuración (local en Pi, GDB stub vía QEMU en x86).
+- `make clean`: limpia `build/`.
+- `make info`: muestra ayuda rápida.
 Detalles ampliados en `docs/makefiles-arm64-variants.md`.
 
 ## 9. Depuración con VS Code
@@ -96,10 +96,8 @@ flowchart LR
 
 ## 11. Documentación técnica
 
-- Depuración VS Code: `docs/debugging-aarch64-vscode.md`
-- Makefiles y variantes (QEMU y nativo): `docs/makefiles-arm64-variants.md`
-- Flujo simple (1 archivo): `docs/makefile-simple-file.md`
-- Flujo multi-archivo: `docs/makefile-multiple-file.md`
+- [Depuración VS Code](docs/debugging-aarch64-vscode.md)
+- [Makefiles y variantes (QEMU y nativo)](docs/makefiles-arm64-variants.md)
 - GPIO / MMIO: futuro (aún no incluido)
 
 ## 12. Lecciones disponibles
