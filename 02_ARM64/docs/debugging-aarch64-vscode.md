@@ -1,261 +1,167 @@
-# Depuración de programas AArch64 (ARM64) en host x86 mediante QEMU y Visual Studio Code
+# Depuración ARM64 (AArch64) con VS Code: entornos nativo ARM y host x86 + QEMU
 Última revisión: 2025-03-17
 
-## Objetivos de la guía
+## Qué cubre esta guía
+- Depuración de binarios ARM64 en Linux escritos en ensamblador (syscalls directas, sin libc).
+- Un mismo código y Makefiles, dos formas de ejecutarlo:
+  - Host ARM64 (Raspberry Pi u otro equipo ARM64): ejecución y GDB nativos, sin QEMU.
+  - Host x86: emulación con QEMU user-mode y depuración remota con gdb-multiarch.
+- Cada sección indica qué instalar, qué comandos usar y cómo adaptar `launch.json` según la arquitectura.
 
-- Configurar depuración con VS Code para dos escenarios: Raspberry Pi (ARM64) y host x86 con QEMU.
-- Reutilizar las mismas fuentes y Makefiles sin cambios.
-- Practicar inspección de registros, memoria y breakpoints en ensamblador.
+## Decide tu flujo (elige solo uno)
+- ¿Tu máquina es ARM64 (Pi 4/5, portátil ARM64, VM ARM)? -> usa **Sección 2 (nativo ARM)**.
+- ¿Tu máquina es x86 y no tienes ARM64? -> usa **Sección 3 (QEMU en x86)**.
 
-## Resumen rápido de flujos de depuración
-
-| Escenario          | Ejecución                 | Conexión GDB                     | Uso típico en VS Code          |
-|--------------------|---------------------------|----------------------------------|--------------------------------|
-| Raspberry Pi local | `./build/main`            | `gdb build/main`                 | `cppdbg` local (`program`, `cwd`) |
-| Raspberry Pi por SSH| `./build/main` vía SSH    | `gdb` remoto (`gdbserver` opcional) | `cppdbg` con `pipeTransport` (SSH) |
-| Host x86 + QEMU    | `qemu-aarch64 -g 1234 …`  | Stub GDB `localhost:1234`        | `cppdbg` con `miDebuggerServerAddress` |
-
-## 1. Objetivo
-
-Configurar un entorno **reproducible y académico** para la **construcción, ejecución y depuración** de programas AArch64 (ARM64) escritos en ensamblador, usando un **host x86 con Linux**, **QEMU en modo usuario** y **depuración remota con GDB integrada en Visual Studio Code**. El flujo soporta múltiples lecciones, cada una con su propio Makefile y binario.
-
----
-
-## 2. Alcance
-
-- Programas escritos en **ensamblador AArch64**
-- Binarios **Linux ARM64** (ELF)
-- Ejecución mediante **QEMU user-mode**
-- Depuración remota con **GDB multi-arquitectura**
-- Interfaz gráfica de depuración mediante **Visual Studio Code**
-
-No se utiliza libc ni funciones de alto nivel; el código interactúa directamente con el kernel Linux mediante **syscalls**.
-
----
-
-## 3. Requisitos del sistema
-
-### 3.1 Sistema operativo anfitrión
-
-- Linux x86_64 (probado en Debian/Ubuntu)
-
-### 3.2 Herramientas en Linux
-
-Instale las siguientes herramientas en el sistema anfitrión:
-
-- **aarch64-linux-gnu-as**  
-  Ensamblador cruzado para la arquitectura AArch64.
-
-- **aarch64-linux-gnu-ld**  
-  Enlazador cruzado para generar ejecutables ELF ARM64.
-
-- **qemu-aarch64**  
-  Emulador de binarios ARM64 en modo usuario.
-
-- **gdb-multiarch**  
-  Depurador GDB con soporte para múltiples arquitecturas, incluyendo AArch64.
-
-#### Instalación típica (Debian/Ubuntu)
-
-```bash
-sudo apt update
-sudo apt install -y binutils-aarch64-linux-gnu qemu-user gdb-multiarch
-```
-
----
-
-## 4. Herramientas de desarrollo
-
-### 4.1 Visual Studio Code
-
-Visual Studio Code se utiliza como entorno de desarrollo y **frontend gráfico del depurador**.
-
-### 4.2 Extensiones de VS Code
-
-- **C/C++ (Microsoft):** habilita el depurador `cppdbg` para actuar como cliente GDB remoto.
-- **Assembly for ARM64:** resaltado y ayudas básicas para archivos `.s` de AArch64.
-- **MemoryView:** panel de memoria durante la depuración.
-
----
-
-## 5. Estructura del proyecto (ejemplo)
-
+## 1. Requisitos comunes (ambos flujos)
+- OS: Linux.
+- VS Code.
+- Extensiones: C/C++, Assembly for ARM64, MemoryView.
+- Ajuste recomendado: `debug.allowBreakpointsEverywhere: true` (ya está en `.vscode/settings.json`).
+- Estructura base:
 ```text
 project-root/
-├── lessons/
-│   ├── 00_hello_world/
-│   │   ├── main.s
-│   │   ├── Makefile            # flujo mínimo (un solo fuente)
-│   │   └── build/
-│   └── 99_test/
-│       ├── main.s
-│       ├── add.s
-│       ├── Makefile            # flujo multi-fuente
-│       └── build/
-├── .vscode/
-│   └── launch.json
-└── docs/
-    └── debugging-aarch64-vscode.md
+├── lessons/00_hello_world/
+│   ├── main.s
+│   ├── Makefile
+│   └── build/
+├── .vscode/launch.json
+└── docs/debugging-aarch64-vscode.md
 ```
 
----
+### Makefiles listos para copiar (según tu host)
+- Host x86 + QEMU: copia `tools/makefile-templates/Makefile.qemu.single` (1 fuente) o `Makefile.qemu.multi` (multi-fuente).
+- Host ARM64 nativo: copia `tools/makefile-templates/Makefile.arm64.single` (1 fuente) o `Makefile.arm64.multi` (multi-fuente).
+- Guía extendida y comparativa en `docs/makefiles-arm64-variants.md`.
 
-## 6. Proceso de construcción (resumen)
-
-1. Ensamblado de los `.s` a objetos ELF (`.o`) con símbolos de depuración (`-g`).
-2. Enlazado de los objetos para generar un ejecutable ELF ARM64 (`build/main`).
-3. Los dos Makefiles mantienen esta secuencia; difieren en el alcance de fuentes y automatización (ver sección 7).
-
----
-
-## 7. Makefiles disponibles
-
-### 7.1 `lessons/00_hello_world/Makefile`
-
-- **Propósito:** flujo mínimo para la lección de arranque; asume un único archivo `main.s`.
-- **Flujo:** ensambla `main.s` → `build/main.o`, enlaza a `build/main`; comandos explícitos y fáciles de seguir.
-- **Pros:** ideal para explicar el pipeline básico; Makefile corto y legible; menos sorpresas.
-- **Contras:** no maneja múltiples fuentes; si agregas otro `.s` debes editar reglas a mano.
-- **Comandos clave:** `make`, `make run`, `make gdb`, `make clean`, `make info`.
-
-### 7.2 `lessons/99_test/Makefile`
-
-- **Propósito:** laboratorio más flexible; compila **todos** los `.s` del directorio (requiere que el punto de entrada sea `main.s`).
-- **Flujo:** detecta automáticamente fuentes auxiliares (`wildcard`), genera objetos en `build/` y enlaza a `build/main`.
-- **Pros:** permite modularizar ejercicios en varios archivos sin tocar el Makefile; mantiene mismos comandos que la lección 00.
-- **Contras:** compila todos los `.s` del directorio (no hay selección parcial); depende de que `main.s` exista y defina `_start`.
-- **Comandos clave:** `make`, `make run`, `make gdb`, `make clean`, `make info`.
-
-Use la lección que necesite (00 para el flujo más sencillo, 99 para experimentos multi-fuente) y ejecute los comandos **desde la carpeta de la lección**.
-
----
-
-## 8. Ejecución mediante QEMU
-
-El ejecutable ARM64 se ejecuta en un host x86 con **QEMU en modo usuario**:
-
-- QEMU traduce dinámicamente instrucciones AArch64 a x86_64.
-- No se emula un sistema completo, solo el proceso de usuario.
-
----
-
-## 9. Depuración remota con QEMU y GDB
-
-### 9.1 GDB stub de QEMU
-
-QEMU puede iniciarse en modo depuración exponiendo un **servidor GDB remoto**:
-
+## 2. Si tu host es ARM64 (nativo, sin QEMU)
+### 2.1 Instala lo necesario en ARM64
 ```bash
-qemu-aarch64 -g 1234 build/main
+sudo apt update
+sudo apt install -y binutils gdb gdbserver
 ```
+- No instales ni uses QEMU para este flujo.
 
-En este modo:
-- El programa se inicia pausado.
-- QEMU espera una conexión GDB en `localhost:1234`.
+### 2.2 Compila y ejecuta en ARM64
+- Con los Makefiles nativos (copia `Makefile.arm64.*` en la lección):
+```bash
+cd lessons/<leccion>
+make          # build
+make run      # ejecuta directo en ARM64 (sin QEMU)
+make gdb      # abre gdb local sobre build/main
+```
+- Manual sin Makefile (host ARM64):
+```bash
+cd lessons/<leccion>
+mkdir -p build
+as -g -o build/main.o main.s             # o aarch64-linux-gnu-as
+ld -o build/main build/main.o            # o aarch64-linux-gnu-ld
+./build/main
+```
+- Los targets `make run`/`make gdb` de las plantillas QEMU son solo para x86; en ARM64 usa las plantillas nativas o ejecuta manualmente.
 
-### 9.2 Cliente GDB
-
-La depuración se realiza mediante **gdb-multiarch**, el cual:
-
-- Se conecta al servidor GDB de QEMU.
-- Entiende la arquitectura AArch64.
-- Permite inspeccionar registros, memoria y flujo de ejecución.
-
-En este proyecto, **gdb-multiarch es invocado por Visual Studio Code**, no directamente desde el Makefile.
-
----
-
-## 10. Integración con Visual Studio Code
-
-El archivo `.vscode/launch.json` define una única configuración `Debug ARM64 (QEMU)` que reutiliza GDB remoto:
-
+### 2.3 Depuración local en ARM64
+```bash
+gdb ./build/main
+```
+- Configuración `launch.json` recomendada (local ARM64):
 ```json
 {
-    "version": "0.2.0",
-    "inputs": [
-        {
-            "id": "lesson",
-            "type": "pickString",
-            "description": "Seleccione la lección",
-            "options": [
-                "00_hello_world",
-                "99_test"
-            ]
-        }
-    ],
-    "configurations": [
-        {
-            "name": "Debug ARM64 (QEMU)",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/lessons/${input:lesson}/build/main",
-            "cwd": "${workspaceFolder}/lessons/${input:lesson}",
-            "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb-multiarch",
-            "miDebuggerServerAddress": "localhost:1234",
-            "stopAtEntry": true,
-            "sourceFileMap": {
-                "${workspaceFolder}/lessons/${input:lesson}": "${workspaceFolder}/lessons/${input:lesson}"
-            },
-            "setupCommands": [
-                {
-                    "text": "-enable-pretty-printing"
-                },
-                {
-                    "text": "set architecture aarch64"
-                },
-                {
-                    "text": "set breakpoint auto-hw on"
-                }
-            ]
-        }
+    "name": "Debug ARM64 (nativo)",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/lessons/${input:lesson}/build/main",
+    "cwd": "${workspaceFolder}/lessons/${input:lesson}",
+    "MIMode": "gdb",
+    "miDebuggerPath": "/usr/bin/gdb",
+    "stopAtEntry": true,
+    "setupCommands": [
+        { "text": "-enable-pretty-printing" },
+        { "text": "set architecture aarch64" }
     ]
 }
 ```
 
-- Al presionar **F5**, VS Code pedirá seleccionar la lección (`00_hello_world` o `99_test`); usa la misma lección donde corriste `make gdb`.
-- `sourceFileMap` mantiene la correspondencia de rutas dentro de la carpeta de la lección para que los breakpoints en `.s` coincidan con las rutas que ve GDB remoto.
-- `set breakpoint auto-hw on` fuerza breakpoints por hardware, útil cuando el código está en páginas de solo lectura.
-- GDB se conecta al stub de QEMU en `localhost:1234`, así que la terminal donde ejecutaste `make gdb` debe permanecer abierta.
+### 2.4 Depuración remota en ARM64 con gdbserver
+- En la Pi/host ARM64:
+```bash
+gdbserver :1234 ./build/main
+```
+- Desde tu PC ARM64 (o VS Code con Remote SSH):
+```bash
+gdb -ex "set architecture aarch64" -ex "target remote <ip>:1234" lessons/<leccion>/build/main
+```
+- Ajuste `launch.json` para gdbserver (añade a la config anterior):
+```json
+    "miDebuggerServerAddress": "<ip-de-la-pi>:1234"
+```
+- Si no usas Remote SSH, agrega `pipeTransport` para tunelar por SSH.
 
-### 10.1 Ajustes recomendados en VS Code
+### 2.5 Checklist nativo ARM
+- `build/main` generado con `AS=as LD=ld` (o prefijo ARM64).
+- Se ejecuta con `./build/main` (sin QEMU).
+- GDB muestra registros ARM64 (`info registers`).
+- Si usas gdbserver, el puerto remoto responde.
 
-- **Breakpoints en cualquier archivo:** activa `Debug: Allow Breakpoints Everywhere` (`debug.allowBreakpointsEverywhere: true`) desde `Settings` o `settings.json` para poder fijar breakpoints en archivos `.s`.
-- **MemoryView:** la extensión agrega el comando *MemoryView: Toggle Memory View for Debugger* accesible con `F1` durante una sesión de depuración.
+## 3. Si tu host es x86 (usa QEMU user-mode)
+### 3.1 Instala lo necesario en x86
+```bash
+sudo apt update
+sudo apt install -y binutils-aarch64-linux-gnu qemu-user gdb-multiarch
+```
+- Necesitas QEMU para ejecutar y un stub GDB para depurar.
 
-### 10.2 Modos de uso en Raspberry Pi
+### 3.2 Compila y ejecuta en x86 con QEMU
+```bash
+cd lessons/<leccion>
+make                 # usa aarch64-linux-gnu-as/ld y genera build/main
+make run             # ejecuta en QEMU user-mode (sin depurar)
+make gdb             # QEMU en pausa, stub GDB en localhost:1234 (deja esta terminal abierta)
+```
+- Opción mínima sin Makefile:
+```bash
+cd lessons/<leccion>
+mkdir -p build
+aarch64-linux-gnu-as -g -o build/main.o main.s
+aarch64-linux-gnu-ld -o build/main build/main.o
+qemu-aarch64 build/main                 # ejecución
+qemu-aarch64 -g 1234 build/main         # depuración (stub GDB)
+```
+- Se recomienda usar los targets `make run`/`make gdb` de las plantillas QEMU para no duplicar comandos.
 
-- **Local (Pi):** ejecuta `make gdb` (o `gdb build/main`), usa la misma configuración `cppdbg` pero sin `miDebuggerServerAddress` (depuración directa).
-- **Remoto (SSH desde VS Code):** conecta VS Code vía SSH, o usa `pipeTransport` en `launch.json` para tunelar `gdb`/`gdbserver`. El binario sigue siendo `build/main` y no requiere QEMU.
+### 3.3 Depuración en x86 con VS Code + gdb-multiarch
+- Configuración `launch.json` para este flujo:
+```json
+{
+    "name": "Debug ARM64 (QEMU)",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/lessons/${input:lesson}/build/main",
+    "cwd": "${workspaceFolder}/lessons/${input:lesson}",
+    "MIMode": "gdb",
+    "miDebuggerPath": "/usr/bin/gdb-multiarch",
+    "miDebuggerServerAddress": "localhost:1234",
+    "stopAtEntry": true,
+    "sourceFileMap": {
+        "${workspaceFolder}/lessons/${input:lesson}": "${workspaceFolder}/lessons/${input:lesson}"
+    },
+    "setupCommands": [
+        { "text": "-enable-pretty-printing" },
+        { "text": "set architecture aarch64" },
+        { "text": "set breakpoint auto-hw on" }
+    ]
+}
+```
+- Flujo: `make gdb` -> F5 con esta configuración -> selecciona la lección.
 
----
-
-## 11. Automatización con Makefile
-
-Ambos Makefiles ofrecen los mismos objetivos:
-
-- `make` : Ensambla y enlaza el programa ARM64.
-- `make run` : Ejecuta el binario mediante QEMU.
-- `make gdb` : Inicia QEMU en modo depuración (servidor GDB en 1234).
-- `make clean` : Limpia `build/`.
-- `make info` : Lista los objetivos disponibles.
-
----
-
-## 12. Flujo general del sistema
-
-### 12.1 Flujo de construcción y ejecución
-
+### 3.4 Diagramas QEMU (referencia)
 ```mermaid
 flowchart TD
-    A[main.s<br/>AArch64 Assembly] --> B[aarch64-linux-gnu-as -g]
-    B --> C[main.o<br/>ELF Object]
+    A[main.s AArch64] --> B[aarch64-linux-gnu-as -g]
+    B --> C[main.o ELF]
     C --> D[aarch64-linux-gnu-ld]
-    D --> E[main<br/>ELF ARM64]
+    D --> E[build/main ELF ARM64]
     E --> F[qemu-aarch64]
 ```
-
-### 12.2 Flujo de depuración remota
 
 ```mermaid
 sequenceDiagram
@@ -266,59 +172,36 @@ sequenceDiagram
     participant G as gdb-multiarch
 
     U->>M: make gdb
-    M->>Q: Ejecuta binario ARM64 (-g 1234)
-    U->>V: Iniciar depuración (F5)
+    M->>Q: Ejecuta binario (-g 1234)
+    U->>V: F5 (config QEMU)
     V->>G: Ejecuta gdb-multiarch
-    G->>Q: Conexión remota localhost:1234
-    V->>G: Comandos de depuración
-    G->>Q: Control de ejecución
+    G->>Q: target remote localhost:1234
+    V->>G: Comandos de depuracion
+    G->>Q: Control de ejecucion
 ```
 
-### 12.3 Flujo de depuración remota en Raspberry Pi (SSH + gdbserver opcional)
+### 3.5 Checklist x86 + QEMU
+- `build/main` existe con símbolos (`-g`).
+- `make gdb` sigue ejecutándose y QEMU escucha en `localhost:1234`.
+- VS Code conecta y los breakpoints en `.s` se activan.
+- MemoryView muestra memoria con la ejecución detenida.
 
-```mermaid
-sequenceDiagram
-    participant U as Usuario (VS Code)
-    participant S as SSH/pipeTransport
-    participant P as Raspberry Pi (gdb/gdbserver)
+### 3.6 Errores comunes (x86)
+- Puerto 1234 ocupado o QEMU cerrado: relanza `make gdb`.
+- Breakpoints sin efecto: revisa `debug.allowBreakpointsEverywhere` y `sourceFileMap`.
+- MemoryView falla: reduce tamaño o usa direcciones válidas (pila, datos).
 
-    U->>S: Inicia sesión SSH (o usa pipeTransport)
-    U->>P: Lanza depuración (gdb o gdbserver)
-    U->>P: Enviar comandos de depuración (break, step, mem)
-    P->>U: Respuestas (estado, registros, memoria)
-```
+## 4. Extensiones y ajustes de VS Code (ambos flujos)
+- C/C++ (Microsoft): habilita `cppdbg`.
+- Assembly for ARM64: resaltado de sintaxis.
+- MemoryView: visualiza memoria con la ejecución detenida.
+- Ajuste: `debug.allowBreakpointsEverywhere` para permitir breakpoints en `.s`.
 
----
+## 5. Resumen operativo por rol
+- Si tienes ARM64 disponible: compila con `AS=as LD=ld`, ejecuta `./build/main`, depura con `gdb` (o `gdbserver` + `miDebuggerServerAddress`), usa `launch.json` sin `miDebuggerServerAddress` para modo local.
+- Si estás en x86 sin ARM64: compila con el toolchain cruzado, ejecuta/depura vía `qemu-aarch64`; usa `gdb-multiarch` y la configuración QEMU con `miDebuggerServerAddress`.
 
-## 13. Procedimiento de uso
-
-1. **Preparar VS Code:** instala las extensiones `C/C++`, `Assembly for ARM64` y `MemoryView`; habilita `Debug: Allow Breakpoints Everywhere` para poder fijar breakpoints en cualquier archivo.
-2. **Elegir la lección** y entrar a su carpeta: `cd lessons/<leccion>`.
-3. **Compilar** el programa: `make`.
-4. **Modo depuración:** `make gdb` (deja la terminal abierta; QEMU queda esperando en `1234`).
-5. **Iniciar depuración en VS Code:** Configuración `Debug ARM64 (QEMU)` → selecciona la misma lección cuando lo solicite → pulsa **F5**.
-6. **Ver memoria con MemoryView:** con la ejecución **detenida** (breakpoint o paso a paso), presiona `F1` y elige `MemoryView: Toggle Memory View for Debugger`; define dirección y tamaño a observar.
-7. Depura con breakpoints, inspección de registros/memoria y paso a paso. Para ejecución directa sin depurar, usa `make run`.
-
-### Checklist de verificación rápida
-
-- El binario se generó en `build/main` con símbolos (`-g`).
-- VS Code muestra breakpoints activos en `.s`.
-- MemoryView abre y muestra la región esperada.
-- En QEMU: el stub escucha en `localhost:1234` y GDB se conecta.
-- En Raspberry Pi: `gdb` local o remoto responde a `info registers`.
-
-### Errores comunes y mitigaciones
-
-- QEMU no responde en `1234`: confirma que `make gdb` sigue activo y no hay otro proceso usando el puerto.
-- Breakpoints que no se activan: verifica `debug.allowBreakpointsEverywhere` y que las rutas coincidan (`sourceFileMap`).
-- Memoria inaccesible en MemoryView: usa direcciones válidas (RAM, pila) y tamaños pequeños al inicio.
-- En SSH: latencias altas pueden causar timeouts; reduce el número de paquetes de símbolos o usa `gdbserver` con opciones mínimas.
-
----
-
-## 14. Observaciones finales
-
-- El entorno separa claramente **construcción**, **emulación** y **depuración**, facilitando el análisis académico.
-- Selecciona `00_hello_world` cuando necesites el pipeline más explícito y simple; usa `99_test` para ejercicios con varios archivos fuente sin tocar el Makefile.
-- No se requiere hardware ARM físico; todo se ejecuta en un host x86 con QEMU.
+## 6. Observaciones finales
+- El código fuente es único; cambian solo las herramientas de ejecución/depuración según el host.
+- No mezcles comandos: `make run/gdb` es solo para x86+QEMU; en ARM64 usa ejecución y GDB nativos.
+- Mantén sincronizados binarios y rutas cuando uses gdbserver o conexiones remotas.

@@ -3,7 +3,18 @@
 
 ## Propósito
 
-Reunir en un solo lugar las copias de los Makefiles actuales (host x86 + QEMU user-mode) y sus variantes para ejecutarse directamente en una máquina **AArch64 nativa** sin QEMU, con enfoque didáctico y comparativas rápidas.
+Reunir en un solo lugar los Makefiles listos para usar en los dos flujos del curso (host x86 con QEMU y host ARM64 nativo) y dejar copias reutilizables dentro del repositorio.
+
+## Plantillas listas para copiar
+- `tools/makefile-templates/Makefile.qemu.single`: host x86 + QEMU, flujo mínimo (1 fuente).
+- `tools/makefile-templates/Makefile.qemu.multi`: host x86 + QEMU, flujo multi-fuente.
+- `tools/makefile-templates/Makefile.arm64.single`: host ARM64 nativo, flujo mínimo (1 fuente).
+- `tools/makefile-templates/Makefile.arm64.multi`: host ARM64 nativo, flujo multi-fuente.
+
+Cómo usarlas:
+1) Entra a la carpeta de la lección.
+2) Copia la plantilla adecuada como `Makefile` (o `Makefile.native` si quieres alternar).
+3) Ejecuta los targets habituales (`make`, `make run`, `make gdb`, etc.).
 
 ---
 
@@ -29,6 +40,7 @@ Lectura recomendada: estudiantes revisan las secciones 0–3; instructores deben
 ---
 
 ## 1. Copias de los Makefiles actuales (host x86 + QEMU)
+(plantillas: `tools/makefile-templates/Makefile.qemu.single` y `tools/makefile-templates/Makefile.qemu.multi`)
 
 ### 1.1 `lessons/00_hello_world/Makefile` (flujo mínimo)
 
@@ -253,6 +265,7 @@ info:
 Pensadas para una máquina AArch64 física o una VM/contendor AArch64, donde se ejecuta el binario directamente (sin emulación). Se mantienen los mismos targets para no cambiar hábitos.
 
 ### 2.1 `Makefile` nativo (lección 00, flujo mínimo)
+(plantilla: `tools/makefile-templates/Makefile.arm64.single`)
 
 ```makefile
 # ==========================================================
@@ -329,6 +342,7 @@ info:
 ```
 
 ### 2.2 `Makefile` nativo (lección 99, multi-fuente)
+(plantilla: `tools/makefile-templates/Makefile.arm64.multi`)
 
 ```makefile
 # ==========================================================
@@ -409,6 +423,16 @@ info:
 	@echo "  make run    -> ejecuta directo"
 	@echo "  make gdb    -> abre gdb local"
 	@echo "  make clean  -> elimina build/"
+```
+
+### 2.3 Ejemplo rápido sin Makefile (host ARM64 nativo)
+```bash
+cd lessons/<leccion>
+mkdir -p build
+as -g -o build/main.o main.s          # o aarch64-linux-gnu-as
+ld -o build/main build/main.o         # o aarch64-linux-gnu-ld
+./build/main                          # ejecución directa
+gdb ./build/main                      # depuración local
 ```
 
 ---

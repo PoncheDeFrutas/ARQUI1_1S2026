@@ -15,13 +15,13 @@ Cuando no haya hardware ARM, se trabaja con QEMU en host x86 sin cambiar las fue
 
 ## 2. Alcance actual
 
-✔ ARM64 user-mode sobre Linux
-✔ Ensamblador GNU (GAS)
-✔ Syscalls Linux
-✔ Análisis de ejecución a bajo nivel
-✘ No bare-metal
-✘ No acceso directo a GPIO
-✘ No RTOS / microcontroladores
+- ARM64 user-mode sobre Linux-
+- Ensamblador GNU (GAS)
+- Syscalls Linux
+- Análisis de ejecución a bajo nivel
+- No bare-metal
+- No acceso directo a GPIO
+- No RTOS / microcontroladores
 El acceso a hardware (GPIO/MMIO) se abordará en fases posteriores.
 
 ## 3. ¿Qué leer primero? (según rol)
