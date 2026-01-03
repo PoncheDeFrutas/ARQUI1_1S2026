@@ -4,9 +4,9 @@
 
 En esta primera lección aprenderás a ejecutar tu **primer programa en ensamblador AArch64 (ARM64)** sobre Linux, **sin usar gcc**, utilizando únicamente:
 
--   `as` (ensamblador)
--   `ld` (enlazador)
--   `qemu-aarch64` (emulación)
+- `as` (ensamblador)
+- `ld` (enlazador)
+- `qemu-aarch64` (emulación)
 
 El programa mostrará el texto **"Hello, world"** en pantalla usando **syscalls de Linux**, y luego finalizará correctamente.
 
@@ -16,11 +16,11 @@ El programa mostrará el texto **"Hello, world"** en pantalla usando **syscalls 
 
 Al finalizar esta lección serás capaz de:
 
--   Entender el punto de entrada `_start` en programas ARM64
--   Usar syscalls en Linux AArch64
--   Comprender el rol de los registros principales en syscalls
--   Ensamblar, enlazar y ejecutar un binario ARM64
--   Ver el resultado usando QEMU
+- Entender el punto de entrada `_start` en programas ARM64
+- Usar syscalls en Linux AArch64
+- Comprender el rol de los registros principales en syscalls
+- Ensamblar, enlazar y ejecutar un binario ARM64
+- Ver el resultado usando QEMU
 
 ---
 
@@ -36,9 +36,9 @@ Las llamadas al sistema permiten interactuar con el kernel (escribir en pantalla
 
 En ARM64:
 
--   El **número de syscall** se coloca en el registro `x8`
--   Los **argumentos** se pasan en `x0`–`x5`
--   La instrucción `svc #0` invoca al kernel
+- El **número de syscall** se coloca en el registro `x8`
+- Los **argumentos** se pasan en `x0`–`x5`
+- La instrucción `svc #0` invoca al kernel
 
 ---
 
@@ -68,15 +68,15 @@ Finaliza el programa.
 
 ## Archivos de esta lección
 
-```
+```text
 lessons/00-hello-world/
 ├── README.md
 ├── main.s
 └── Makefile
 ```
 
--   `main.s`: código ensamblador ARM64
--   `Makefile`: automatiza ensamblado, enlace y ejecución
+- `main.s`: código ensamblador ARM64
+- `Makefile`: automatiza ensamblado, enlace y ejecución
 
 ---
 
@@ -125,11 +125,11 @@ Esto dejará el programa detenido esperando que GDB se conecte.
 
 Al revisar `main.s`, presta atención a:
 
--   Uso de `.data` para almacenar el mensaje
--   Uso de `.text` para el código
--   Carga de direcciones con `adr`
--   Uso explícito de registros `x0`, `x1`, `x2`, `x8`
--   La instrucción `svc #0`
+- Uso de `.data` para almacenar el mensaje
+- Uso de `.text` para el código
+- Carga de direcciones con `adr`
+- Uso explícito de registros `x0`, `x1`, `x2`, `x8`
+- La instrucción `svc #0`
 
 No te preocupes si aún no entiendes cada instrucción: **las siguientes lecciones profundizarán en cada concepto**.
 
@@ -137,22 +137,22 @@ No te preocupes si aún no entiendes cada instrucción: **las siguientes leccion
 
 ## Errores comunes
 
--   Olvidar definir `_start`
--   Usar números de syscall incorrectos
--   Confundir registros `x` con `w`
--   Esperar que exista `main`
+- Olvidar definir `_start`
+- Usar números de syscall incorrectos
+- Confundir registros `x` con `w`
+- Esperar que exista `main`
 
 ---
 
 ## Próxima lección
 
-**Lección 01 – Registros en ARM64**
+### Lección 01 – Registros en ARM64
 
 Exploraremos:
 
--   Registros `x0–x30`
--   Diferencia entre `xN` y `wN`
--   Convenciones básicas de uso
+- Registros `x0–x30`
+- Diferencia entre `xN` y `wN`
+- Convenciones básicas de uso
 
 ---
 
@@ -162,9 +162,9 @@ Este proyecto está diseñado con fines **educativos**.
 
 Todo el código:
 
--   Es explícito
--   Evita dependencias innecesarias
--   Prioriza claridad sobre optimización
+- Es explícito
+- Evita dependencias innecesarias
+- Prioriza claridad sobre optimización
 
 Si vienes de x86 y x64_64 o de lenguajes de alto nivel, tómate tu tiempo: ARM64 tiene un diseño limpio y coherente que vale la pena aprender desde la base.
 
