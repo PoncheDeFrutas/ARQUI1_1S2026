@@ -1,11 +1,11 @@
-
-
 # Laboratorio de Programación en Ensamblador ARM64 (AArch64) en Linux
+
 Última revisión: 2025-03-17
 
 ## 1. Introducción / Propósito
 
 Proyecto académico para ejecutar y depurar programas en ensamblador ARM64 **principalmente en Raspberry Pi (ARM64)** con Linux. Se estudian:
+
 - Ensamblador ARM64 (GAS)
 - ABI AArch64
 - Syscalls Linux
@@ -22,14 +22,14 @@ Cuando no haya hardware ARM, se trabaja con QEMU en host x86 sin cambiar las fue
 - No bare-metal
 - No acceso directo a GPIO
 - No RTOS / microcontroladores
-El acceso a hardware (GPIO/MMIO) se abordará en fases posteriores.
+  El acceso a hardware (GPIO/MMIO) se abordará en fases posteriores.
 
 ## 3. ¿Qué leer primero? (según rol)
 
-| Rol        | Lecturas sugeridas                                          | Tiempo estimado |
-|------------|-------------------------------------------------------------|-----------------|
-| Estudiante | README (secciones 1–8), `docs/debugging-aarch64-vscode.md`  | 20–30 min       |
-| Instructor | README completo, `docs/makefiles-arm64-variants.md`, guías  | 30–40 min       |
+| Rol        | Lecturas sugeridas                                         | Tiempo estimado |
+| ---------- | ---------------------------------------------------------- | --------------- |
+| Estudiante | README (secciones 1–8), `docs/debugging-aarch64-vscode.md` | 20–30 min       |
+| Instructor | README completo, `docs/makefiles-arm64-variants.md`, guías | 30–40 min       |
 
 ## 4. Estructura del repositorio
 
@@ -46,25 +46,28 @@ El acceso a hardware (GPIO/MMIO) se abordará en fases posteriores.
 
 ## 6. Plataformas soportadas
 
-| Flujo          | Ejecución                           | Depuración                        | Toolchain                     |
-|----------------|-------------------------------------|-----------------------------------|-------------------------------|
-| Raspberry Pi   | Nativa (`./build/main`)             | `gdb` local o VS Code remoto SSH  | `as`, `ld`, `gdb`             |
-| Host x86 + QEMU| `qemu-aarch64 build/main`           | GDB stub `localhost:1234` + VS Code| `aarch64-linux-gnu-*`, `gdb-multiarch` |
+| Flujo           | Ejecución                 | Depuración                          | Toolchain                              |
+| --------------- | ------------------------- | ----------------------------------- | -------------------------------------- |
+| Raspberry Pi    | Nativa (`./build/main`)   | `gdb` local o VS Code remoto SSH    | `as`, `ld`, `gdb`                      |
+| Host x86 + QEMU | `qemu-aarch64 build/main` | GDB stub `localhost:1234` + VS Code | `aarch64-linux-gnu-*`, `gdb-multiarch` |
 
 - El uso de QEMU no altera los conceptos estudiados.
 
 ## 7. Requisitos del sistema
 
 ### Generales
+
 - Linux
 - Visual Studio Code + extensión **C/C++**
 
 ### Raspberry Pi (ARM64)
+
 - OS Linux ARM64
 - `binutils` (as/ld)
 - `gdb`
 
 ### Host x86
+
 - `qemu-aarch64`
 - `gdb-multiarch`
 - Toolchain cruzado `aarch64-linux-gnu-*`
@@ -72,12 +75,13 @@ El acceso a hardware (GPIO/MMIO) se abordará en fases posteriores.
 ## 8. Compilación y ejecución (visión general)
 
 Las mismas fuentes se ejecutan sin modificación tanto en Raspberry Pi como en QEMU.
+
 - `make` (o `make all`): ensambla y enlaza con símbolos de depuración.
 - `make run`: ejecuta el binario (nativo en Pi, emulado en x86).
 - `make gdb`: depuración (local en Pi, GDB stub vía QEMU en x86).
 - `make clean`: limpia `build/`.
 - `make info`: muestra ayuda rápida.
-Detalles ampliados en `docs/makefiles-arm64-variants.md`.
+    Detalles ampliados en `docs/makefiles-arm64-variants.md`.
 
 ## 9. Depuración con VS Code
 

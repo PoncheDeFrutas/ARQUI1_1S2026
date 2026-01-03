@@ -1,4 +1,5 @@
 # Makefiles ARM64: QEMU en host x86 vs. variantes nativas
+
 Última revisión: 2025-03-17
 
 ## Propósito
@@ -6,15 +7,17 @@
 Reunir en un solo lugar los Makefiles listos para usar en los dos flujos del curso (host x86 con QEMU y host ARM64 nativo) y dejar copias reutilizables dentro del repositorio.
 
 ## Plantillas listas para copiar
+
 - `tools/makefile-templates/Makefile.qemu.single`: host x86 + QEMU, flujo mínimo (1 fuente).
 - `tools/makefile-templates/Makefile.qemu.multi`: host x86 + QEMU, flujo multi-fuente.
 - `tools/makefile-templates/Makefile.arm64.single`: host ARM64 nativo, flujo mínimo (1 fuente).
 - `tools/makefile-templates/Makefile.arm64.multi`: host ARM64 nativo, flujo multi-fuente.
 
 Cómo usarlas:
-1) Entra a la carpeta de la lección.
-2) Copia la plantilla adecuada como `Makefile` (o `Makefile.native` si quieres alternar).
-3) Ejecuta los targets habituales (`make`, `make run`, `make gdb`, etc.).
+
+1. Entra a la carpeta de la lección.
+2. Copia la plantilla adecuada como `Makefile` (o `Makefile.native` si quieres alternar).
+3. Ejecuta los targets habituales (`make`, `make run`, `make gdb`, etc.).
 
 ---
 
@@ -30,16 +33,17 @@ Cómo usarlas:
 
 ## ¿Qué flujo usar? (resumen comparativo)
 
-| Flujo           | Ejecución           | Depuración                | Toolchain                      | Cuándo elegirlo                     |
-|-----------------|---------------------|---------------------------|--------------------------------|-------------------------------------|
-| Host x86 + QEMU | `qemu-aarch64`      | Stub GDB `localhost:1234` | `aarch64-linux-gnu-*`, `gdb-multiarch` | No hay hardware ARM disponible      |
-| Raspberry Pi    | Ejecución directa   | `gdb` local o remoto SSH  | `as`, `ld`, `gdb`              | Hay hardware ARM64 (nativo)         |
+| Flujo           | Ejecución         | Depuración                | Toolchain                              | Cuándo elegirlo                |
+| --------------- | ----------------- | ------------------------- | -------------------------------------- | ------------------------------ |
+| Host x86 + QEMU | `qemu-aarch64`    | Stub GDB `localhost:1234` | `aarch64-linux-gnu-*`, `gdb-multiarch` | No hay hardware ARM disponible |
+| Raspberry Pi    | Ejecución directa | `gdb` local o remoto SSH  | `as`, `ld`, `gdb`                      | Hay hardware ARM64 (nativo)    |
 
 Lectura recomendada: estudiantes revisan las secciones 0–3; instructores deben leer también las diferencias y notas de uso.
 
 ---
 
 ## 1. Copias de los Makefiles actuales (host x86 + QEMU)
+
 (plantillas: `tools/makefile-templates/Makefile.qemu.single` y `tools/makefile-templates/Makefile.qemu.multi`)
 
 ### 1.1 `lessons/00_hello_world/Makefile` (flujo mínimo)
@@ -70,7 +74,7 @@ BIN     = $(BUILD)/main
 # ---------------------------------------------------------
 # Flags
 # ---------------------------------------------------------
-ASFLAGS = -g                 			# símbolos de debug
+ASFLAGS = -g                    # símbolos de debug
 LDFLAGS =
 
 # ---------------------------------------------------------
@@ -82,42 +86,42 @@ all: $(BIN)
 
 # Crear carpeta build si no existe
 $(BUILD):
-	mkdir -p $(BUILD)
+ mkdir -p $(BUILD)
 
 # Ensamblar
 $(OBJ): $(SRC) | $(BUILD)
-	$(AS) $(ASFLAGS) -o $@ $<
+ $(AS) $(ASFLAGS) -o $@ $<
 
 # Enlazar
 $(BIN): $(OBJ)
-	$(LD) $(LDFLAGS) -o $@ $<
+ $(LD) $(LDFLAGS) -o $@ $<
 
 # Ejecutar normalmente en QEMU
 run: $(BIN)
-	$(QEMU) $(BIN)
+ $(QEMU) $(BIN)
 
 # ---------------------------------------------------------
 # Debug con QEMU + GDB remoto
 # ---------------------------------------------------------
 gdb: $(BIN)
-	@echo "Starting QEMU and waiting for GDB on port 1234..."
-	$(QEMU) -g 1234 $(BIN)
+ @echo "Starting QEMU and waiting for GDB on port 1234..."
+ $(QEMU) -g 1234 $(BIN)
 
 # ---------------------------------------------------------
 # Limpieza
 # ---------------------------------------------------------
 clean:
-	rm -rf $(BUILD)
+ rm -rf $(BUILD)
 
 # ---------------------------------------------------------
 # Utilidades
 # ---------------------------------------------------------
 info:
-	@echo "Targets disponibles:"
-	@echo "  make        -> compila el programa"
-	@echo "  make run    -> ejecuta en QEMU"
-	@echo "  make gdb    -> QEMU + espera GDB (VS Code)"
-	@echo "  make clean  -> limpia build/"
+ @echo "Targets disponibles:"
+ @echo "  make        -> compila el programa"
+ @echo "  make run    -> ejecuta en QEMU"
+ @echo "  make gdb    -> QEMU + espera GDB (VS Code)"
+ @echo "  make clean  -> limpia build/"
 ```
 
 ### 1.2 `lessons/99_test/Makefile` (flujo multi-fuente)
@@ -203,17 +207,17 @@ all: $(TARGET)
 
 # Crear el directorio build si no existe
 $(BUILD):
-	mkdir -p $(BUILD)
+ mkdir -p $(BUILD)
 
 # Ensamblado de cualquier archivo .s a .o
 # $< : archivo fuente
 # $@ : archivo destino
 $(BUILD)/%.o: %.s | $(BUILD)
-	$(AS) $(ASFLAGS) -o $@ $<
+ $(AS) $(ASFLAGS) -o $@ $<
 
 # Enlazado final: genera el ejecutable ELF ARM64
 $(TARGET): $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $(OBJS)
+ $(LD) $(LDFLAGS) -o $@ $(OBJS)
 
 
 # ----------------------------------------------------------
@@ -222,7 +226,7 @@ $(TARGET): $(OBJS)
 
 # Ejecuta el programa ARM64 en QEMU (sin depuración)
 run: $(TARGET)
-	$(QEMU) $(TARGET)
+ $(QEMU) $(TARGET)
 
 
 # ----------------------------------------------------------
@@ -232,8 +236,8 @@ run: $(TARGET)
 # Inicia QEMU en modo GDB stub
 # El programa queda pausado esperando conexión en localhost:1234
 gdb: $(TARGET)
-	@echo "Starting QEMU and waiting for GDB on port 1234..."
-	$(QEMU) -g 1234 $(TARGET)
+ @echo "Starting QEMU and waiting for GDB on port 1234..."
+ $(QEMU) -g 1234 $(TARGET)
 
 
 # ----------------------------------------------------------
@@ -242,7 +246,7 @@ gdb: $(TARGET)
 
 # Elimina archivos generados
 clean:
-	rm -rf $(BUILD)
+ rm -rf $(BUILD)
 
 
 # ----------------------------------------------------------
@@ -251,11 +255,11 @@ clean:
 
 # Muestra los targets disponibles
 info:
-	@echo "Targets disponibles:"
-	@echo "  make        -> ensambla y enlaza el programa ARM64"
-	@echo "  make run    -> ejecuta el binario en QEMU"
-	@echo "  make gdb    -> ejecuta QEMU y espera conexión de GDB (VS Code)"
-	@echo "  make clean  -> elimina el directorio build/"
+ @echo "Targets disponibles:"
+ @echo "  make        -> ensambla y enlaza el programa ARM64"
+ @echo "  make run    -> ejecuta el binario en QEMU"
+ @echo "  make gdb    -> ejecuta QEMU y espera conexión de GDB (VS Code)"
+ @echo "  make clean  -> elimina el directorio build/"
 ```
 
 ---
@@ -265,6 +269,7 @@ info:
 Pensadas para una máquina AArch64 física o una VM/contendor AArch64, donde se ejecuta el binario directamente (sin emulación). Se mantienen los mismos targets para no cambiar hábitos.
 
 ### 2.1 `Makefile` nativo (lección 00, flujo mínimo)
+
 (plantilla: `tools/makefile-templates/Makefile.arm64.single`)
 
 ```makefile
@@ -304,44 +309,45 @@ all: $(BIN)
 
 # Crear carpeta build si no existe
 $(BUILD):
-	mkdir -p $(BUILD)
+ mkdir -p $(BUILD)
 
 # Ensamblar
 $(OBJ): $(SRC) | $(BUILD)
-	$(AS) $(ASFLAGS) -o $@ $<
+ $(AS) $(ASFLAGS) -o $@ $<
 
 # Enlazar
 $(BIN): $(OBJ)
-	$(LD) $(LDFLAGS) -o $@ $<
+ $(LD) $(LDFLAGS) -o $@ $<
 
 # Ejecutar directamente en host ARM64
 run: $(BIN)
-	$(BIN)
+ $(BIN)
 
 # ---------------------------------------------------------
 # Debug local (sin QEMU)
 # ---------------------------------------------------------
 gdb: $(BIN)
-	gdb $(BIN)
+ gdb $(BIN)
 
 # ---------------------------------------------------------
 # Limpieza
 # ---------------------------------------------------------
 clean:
-	rm -rf $(BUILD)
+ rm -rf $(BUILD)
 
 # ---------------------------------------------------------
 # Utilidades
 # ---------------------------------------------------------
 info:
-	@echo "Targets:"
-	@echo "  make        -> compila el programa"
-	@echo "  make run    -> ejecuta directamente en ARM64"
-	@echo "  make gdb    -> abre gdb local"
-	@echo "  make clean  -> limpia build/"
+ @echo "Targets:"
+ @echo "  make        -> compila el programa"
+ @echo "  make run    -> ejecuta directamente en ARM64"
+ @echo "  make gdb    -> abre gdb local"
+ @echo "  make clean  -> limpia build/"
 ```
 
 ### 2.2 `Makefile` nativo (lección 99, multi-fuente)
+
 (plantilla: `tools/makefile-templates/Makefile.arm64.multi`)
 
 ```makefile
@@ -386,46 +392,47 @@ all: $(TARGET)
 
 # Crear el directorio build si no existe
 $(BUILD):
-	mkdir -p $(BUILD)
+ mkdir -p $(BUILD)
 
 # Ensamblado de cualquier archivo .s a .o
 $(BUILD)/%.o: %.s | $(BUILD)
-	$(AS) $(ASFLAGS) -o $@ $<
+ $(AS) $(ASFLAGS) -o $@ $<
 
 # Enlazado final
 $(TARGET): $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $(OBJS)
+ $(LD) $(LDFLAGS) -o $@ $(OBJS)
 
 # ----------------------------------------------------------
 # Ejecución (sin QEMU)
 # ----------------------------------------------------------
 run: $(TARGET)
-	$(TARGET)
+ $(TARGET)
 
 # ----------------------------------------------------------
 # Depuración local
 # ----------------------------------------------------------
 gdb: $(TARGET)
-	gdb $(TARGET)
+ gdb $(TARGET)
 
 # ----------------------------------------------------------
 # Limpieza
 # ----------------------------------------------------------
 clean:
-	rm -rf $(BUILD)
+ rm -rf $(BUILD)
 
 # ----------------------------------------------------------
 # Información de ayuda
 # ----------------------------------------------------------
 info:
-	@echo "Targets:"
-	@echo "  make        -> ensambla y enlaza en ARM64 nativo"
-	@echo "  make run    -> ejecuta directo"
-	@echo "  make gdb    -> abre gdb local"
-	@echo "  make clean  -> elimina build/"
+ @echo "Targets:"
+ @echo "  make        -> ensambla y enlaza en ARM64 nativo"
+ @echo "  make run    -> ejecuta directo"
+ @echo "  make gdb    -> abre gdb local"
+ @echo "  make clean  -> elimina build/"
 ```
 
 ### 2.3 Ejemplo rápido sin Makefile (host ARM64 nativo)
+
 ```bash
 cd lessons/<leccion>
 mkdir -p build
