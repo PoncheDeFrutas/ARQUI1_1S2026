@@ -1,4 +1,4 @@
-# Template: ARM64 en host x86 con QEMU (flujo multi-fuente)
+# Template: ARM64 en host x86 y x64 con QEMU (flujo multi-fuente)
 # Copia este archivo como Makefile dentro de la lección.
 
 # ----------------------------------------------------------

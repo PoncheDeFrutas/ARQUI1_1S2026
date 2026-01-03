@@ -4,7 +4,7 @@
 # Este Makefile permite:
 #  - Ensamblar uno o más archivos AArch64 (.s)
 #  - Enlazarlos en un único ejecutable ELF ARM64
-#  - Ejecutar el binario en un host x86 usando QEMU (user-mode)
+#  - Ejecutar el binario en un host x86 y x64 usando QEMU (user-mode)
 #  - Depurar el programa mediante GDB remoto desde VS Code
 #
 # Convenciones del proyecto:

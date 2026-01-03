@@ -1,15 +1,15 @@
-# Makefiles ARM64: QEMU en host x86 vs. variantes nativas
+# Makefiles ARM64: QEMU en host x86 y x64 vs. variantes nativas
 
 Última revisión: 2025-03-17
 
 ## Propósito
 
-Reunir en un solo lugar los Makefiles listos para usar en los dos flujos del curso (host x86 con QEMU y host ARM64 nativo) y dejar copias reutilizables dentro del repositorio.
+Reunir en un solo lugar los Makefiles listos para usar en los dos flujos del curso (host x86 y x64 con QEMU y host ARM64 nativo) y dejar copias reutilizables dentro del repositorio.
 
 ## Plantillas listas para copiar
 
-- `tools/makefile-templates/Makefile.qemu.single`: host x86 + QEMU, flujo mínimo (1 fuente).
-- `tools/makefile-templates/Makefile.qemu.multi`: host x86 + QEMU, flujo multi-fuente.
+- `tools/makefile-templates/Makefile.qemu.single`: host x86 y x64 + QEMU, flujo mínimo (1 fuente).
+- `tools/makefile-templates/Makefile.qemu.multi`: host x86 y x64 + QEMU, flujo multi-fuente.
 - `tools/makefile-templates/Makefile.arm64.single`: host ARM64 nativo, flujo mínimo (1 fuente).
 - `tools/makefile-templates/Makefile.arm64.multi`: host ARM64 nativo, flujo multi-fuente.
 
@@ -24,8 +24,8 @@ Cómo usarlas:
 ## 0. Targets disponibles (aplican a todas las variantes)
 
 - `make` / `make all`: ensambla y enlaza el binario (con símbolos de depuración `-g`).
-- `make run`: ejecuta el binario. En host x86 usa `qemu-aarch64`; en host ARM64 lo ejecuta directamente.
-- `make gdb`: lanza depuración. En x86 arranca QEMU con stub GDB en `localhost:1234`; en ARM64 abre `gdb` local sobre el binario.
+- `make run`: ejecuta el binario. En host x86 y x64 usa `qemu-aarch64`; en host ARM64 lo ejecuta directamente.
+- `make gdb`: lanza depuración. En x86 y x64 arranca QEMU con stub GDB en `localhost:1234`; en ARM64 abre `gdb` local sobre el binario.
 - `make clean`: borra el directorio `build/`.
 - `make info`: muestra un resumen de los targets disponibles.
 
@@ -33,16 +33,16 @@ Cómo usarlas:
 
 ## ¿Qué flujo usar? (resumen comparativo)
 
-| Flujo           | Ejecución         | Depuración                | Toolchain                              | Cuándo elegirlo                |
-| --------------- | ----------------- | ------------------------- | -------------------------------------- | ------------------------------ |
-| Host x86 + QEMU | `qemu-aarch64`    | Stub GDB `localhost:1234` | `aarch64-linux-gnu-*`, `gdb-multiarch` | No hay hardware ARM disponible |
-| Raspberry Pi    | Ejecución directa | `gdb` local o remoto SSH  | `as`, `ld`, `gdb`                      | Hay hardware ARM64 (nativo)    |
+| Flujo                 | Ejecución         | Depuración                | Toolchain                              | Cuándo elegirlo                |
+| --------------------- | ----------------- | ------------------------- | -------------------------------------- | ------------------------------ |
+| Host x86 y x64 + QEMU | `qemu-aarch64`    | Stub GDB `localhost:1234` | `aarch64-linux-gnu-*`, `gdb-multiarch` | No hay hardware ARM disponible |
+| Raspberry Pi          | Ejecución directa | `gdb` local o remoto SSH  | `as`, `ld`, `gdb`                      | Hay hardware ARM64 (nativo)    |
 
 Lectura recomendada: estudiantes revisan las secciones 0–3; instructores deben leer también las diferencias y notas de uso.
 
 ---
 
-## 1. Copias de los Makefiles actuales (host x86 + QEMU)
+## 1. Copias de los Makefiles actuales (host x86 y x64 + QEMU)
 
 (plantillas: `tools/makefile-templates/Makefile.qemu.single` y `tools/makefile-templates/Makefile.qemu.multi`)
 
@@ -133,7 +133,7 @@ info:
 # Este Makefile permite:
 #  - Ensamblar uno o más archivos AArch64 (.s)
 #  - Enlazarlos en un único ejecutable ELF ARM64
-#  - Ejecutar el binario en un host x86 usando QEMU (user-mode)
+#  - Ejecutar el binario en un host x86 y x64 usando QEMU (user-mode)
 #  - Depurar el programa mediante GDB remoto desde VS Code
 #
 # Convenciones del proyecto:
@@ -446,17 +446,17 @@ gdb ./build/main                      # depuración local
 
 ## 3. Diferencias clave (QEMU vs. nativo)
 
-- **Toolchain:** cruzada con prefijo `aarch64-linux-gnu-*` (host x86) vs. toolchain nativa `as/ld` en host ARM64.
+- **Toolchain:** cruzada con prefijo `aarch64-linux-gnu-*` (host x86 y x64) vs. toolchain nativa `as/ld` en host ARM64.
 - **Ejecución:** `qemu-aarch64 <bin>` o `qemu-aarch64 -g 1234 <bin>` para emulación y depuración remota; en nativo se invoca el binario directamente.
 - **Depuración:** en QEMU se usa un stub GDB remoto en `localhost:1234` (útil para VS Code con `miDebuggerServerAddress`); en nativo se puede usar `gdb` local (o `gdb-multiarch` sin stub). Si se usa VS Code en nativo, basta configurar `cppdbg` con `program` y `cwd` sin `miDebuggerServerAddress`.
-- **Portabilidad:** los Makefiles con QEMU permiten trabajar en host x86; los nativos eliminan la dependencia de emulación pero requieren hardware/VM ARM64.
+- **Portabilidad:** los Makefiles con QEMU permiten trabajar en host x86 y x64; los nativos eliminan la dependencia de emulación pero requieren hardware/VM ARM64.
 - **Rendimiento:** en nativo la ejecución es directa; en QEMU hay sobrecosto de traducción dinámica.
 
 ---
 
 ## 4. Uso sugerido
 
-- En host x86: usa los Makefiles originales (secciones 1.1 y 1.2) para construir/ejecutar con QEMU y depurar con VS Code mediante GDB remoto.
+- En host x86 y x64: usa los Makefiles originales (secciones 1.1 y 1.2) para construir/ejecutar con QEMU y depurar con VS Code mediante GDB remoto.
 - En host ARM64: cambia el Makefile por su variante nativa (2.1 o 2.2) o guárdalo como `Makefile.native` para alternar; ejecuta `make`, `make run` y `make gdb` sin QEMU.
 
 ## 5. Notas pedagógicas y checklist
@@ -471,6 +471,6 @@ gdb ./build/main                      # depuración local
 
 ## 6. Errores comunes
 
-- Ejecutar `make run` en x86 sin QEMU instalado: instala `qemu-aarch64` o usa el flujo nativo solo en ARM64.
+- Ejecutar `make run` en x86 y x64 sin QEMU instalado: instala `qemu-aarch64` o usa el flujo nativo solo en ARM64.
 - Breakpoints que no enganchan con QEMU: confirma `set breakpoint auto-hw on` y que `sourceFileMap` coincida (ver `docs/debugging-aarch64-vscode.md`).
 - En nativo, usar la toolchain cruzada en vez de la nativa: sustituye `aarch64-linux-gnu-*` por `as/ld` si estás en Raspberry Pi.

@@ -1,4 +1,4 @@
-# Depuración ARM64 (AArch64) con VS Code: entornos nativo ARM y host x86 + QEMU
+# Depuración ARM64 (AArch64) con VS Code: entornos nativo ARM y host x86 y x64 + QEMU
 
 Última revisión: 2025-03-17
 
@@ -7,13 +7,13 @@
 - Depuración de binarios ARM64 en Linux escritos en ensamblador (syscalls directas, sin libc).
 - Un mismo código y Makefiles, dos formas de ejecutarlo:
   - Host ARM64 (Raspberry Pi u otro equipo ARM64): ejecución y GDB nativos, sin QEMU.
-  - Host x86: emulación con QEMU user-mode y depuración remota con gdb-multiarch.
+  - Host x86 y x64: emulación con QEMU user-mode y depuración remota con gdb-multiarch.
 - Cada sección indica qué instalar, qué comandos usar y cómo adaptar `launch.json` según la arquitectura.
 
 ## Decide tu flujo (elige solo uno)
 
 - ¿Tu máquina es ARM64 (Pi 4/5, portátil ARM64, VM ARM)? -> usa **Sección 2 (nativo ARM)**.
-- ¿Tu máquina es x86 y no tienes ARM64? -> usa **Sección 3 (QEMU en x86)**.
+- ¿Tu máquina es x86 y x64 y no tienes ARM64? -> usa **Sección 3 (QEMU en x86 y x64)**.
 
 ## 1. Requisitos comunes (ambos flujos)
 
@@ -35,7 +35,7 @@ project-root/
 
 ### Makefiles listos para copiar (según tu host)
 
-- Host x86 + QEMU: copia `tools/makefile-templates/Makefile.qemu.single` (1 fuente) o `Makefile.qemu.multi` (multi-fuente).
+- Host x86 y x64 + QEMU: copia `tools/makefile-templates/Makefile.qemu.single` (1 fuente) o `Makefile.qemu.multi` (multi-fuente).
 - Host ARM64 nativo: copia `tools/makefile-templates/Makefile.arm64.single` (1 fuente) o `Makefile.arm64.multi` (multi-fuente).
 - Guía extendida y comparativa en `docs/makefiles-arm64-variants.md`.
 
@@ -71,7 +71,7 @@ ld -o build/main build/main.o            # o aarch64-linux-gnu-ld
 ./build/main
 ```
 
-- Los targets `make run`/`make gdb` de las plantillas QEMU son solo para x86; en ARM64 usa las plantillas nativas o ejecuta manualmente.
+- Los targets `make run`/`make gdb` de las plantillas QEMU son solo para x86 y x64; en ARM64 usa las plantillas nativas o ejecuta manualmente.
 
 ### 2.3 Depuración local en ARM64
 
@@ -129,9 +129,9 @@ gdb -ex "set architecture aarch64" -ex "target remote <ip>:1234" lessons/<leccio
 - GDB muestra registros ARM64 (`info registers`).
 - Si usas gdbserver, el puerto remoto responde.
 
-## 3. Si tu host es x86 (usa QEMU user-mode)
+## 3. Si tu host es x86 y x64 (usa QEMU user-mode)
 
-### 3.1 Instala lo necesario en x86
+### 3.1 Instala lo necesario en x86 y x64
 
 ```bash
 sudo apt update
@@ -140,7 +140,7 @@ sudo apt install -y binutils-aarch64-linux-gnu qemu-user gdb-multiarch build-ess
 
 - Necesitas QEMU para ejecutar y un stub GDB para depurar.
 
-### 3.2 Compila y ejecuta en x86 con QEMU
+### 3.2 Compila y ejecuta en x86 y x64 con QEMU
 
 ```bash
 cd lessons/<leccion>
@@ -162,7 +162,7 @@ qemu-aarch64 -g 1234 build/main         # depuración (stub GDB)
 
 - Se recomienda usar los targets `make run`/`make gdb` de las plantillas QEMU para no duplicar comandos.
 
-### 3.3 Depuración en x86 con VS Code + gdb-multiarch
+### 3.3 Depuración en x86 y x64 con VS Code + gdb-multiarch
 
 - Configuración `launch.json` para este flujo:
 
@@ -218,14 +218,14 @@ sequenceDiagram
     G->>Q: Control de ejecucion
 ```
 
-### 3.5 Checklist x86 + QEMU
+### 3.5 Checklist x86 y x64 + QEMU
 
 - `build/main` existe con símbolos (`-g`).
 - `make gdb` sigue ejecutándose y QEMU escucha en `localhost:1234`.
 - VS Code conecta y los breakpoints en `.s` se activan.
 - MemoryView muestra memoria con la ejecución detenida.
 
-### 3.6 Errores comunes (x86)
+### 3.6 Errores comunes (x86 y x64)
 
 - Puerto 1234 ocupado o QEMU cerrado: relanza `make gdb`.
 - Breakpoints sin efecto: revisa `debug.allowBreakpointsEverywhere` y `sourceFileMap`.
@@ -241,10 +241,10 @@ sequenceDiagram
 ## 5. Resumen operativo por rol
 
 - Si tienes ARM64 disponible: compila con `AS=as LD=ld`, ejecuta `./build/main`, depura con `gdb` (o `gdbserver` + `miDebuggerServerAddress`), usa `launch.json` sin `miDebuggerServerAddress` para modo local.
-- Si estás en x86 sin ARM64: compila con el toolchain cruzado, ejecuta/depura vía `qemu-aarch64`; usa `gdb-multiarch` y la configuración QEMU con `miDebuggerServerAddress`.
+- Si estás en x86 y x64 sin ARM64: compila con el toolchain cruzado, ejecuta/depura vía `qemu-aarch64`; usa `gdb-multiarch` y la configuración QEMU con `miDebuggerServerAddress`.
 
 ## 6. Observaciones finales
 
 - El código fuente es único; cambian solo las herramientas de ejecución/depuración según el host.
-- No mezcles comandos: `make run/gdb` es solo para x86+QEMU; en ARM64 usa ejecución y GDB nativos.
+- No mezcles comandos: `make run/gdb` es solo para x86 y x64+QEMU; en ARM64 usa ejecución y GDB nativos.
 - Mantén sincronizados binarios y rutas cuando uses gdbserver o conexiones remotas.

@@ -11,7 +11,7 @@ Proyecto académico para ejecutar y depurar programas en ensamblador ARM64 **pri
 - Syscalls Linux
 - Stack, registros y memoria
 
-Cuando no haya hardware ARM, se trabaja con QEMU en host x86 sin cambiar las fuentes. Futuras fases incorporarán acceso a memoria mapeada, GPIO en Raspberry Pi e interacción directa con hardware.
+Cuando no haya hardware ARM, se trabaja con QEMU en host x86 y x64 sin cambiar las fuentes. Futuras fases incorporarán acceso a memoria mapeada, GPIO en Raspberry Pi e interacción directa con hardware.
 
 ## 2. Alcance actual
 
@@ -22,7 +22,7 @@ Cuando no haya hardware ARM, se trabaja con QEMU en host x86 sin cambiar las fue
 - No bare-metal
 - No acceso directo a GPIO
 - No RTOS / microcontroladores
-  El acceso a hardware (GPIO/MMIO) se abordará en fases posteriores.
+    El acceso a hardware (GPIO/MMIO) se abordará en fases posteriores.
 
 ## 3. ¿Qué leer primero? (según rol)
 
@@ -46,10 +46,10 @@ Cuando no haya hardware ARM, se trabaja con QEMU en host x86 sin cambiar las fue
 
 ## 6. Plataformas soportadas
 
-| Flujo           | Ejecución                 | Depuración                          | Toolchain                              |
-| --------------- | ------------------------- | ----------------------------------- | -------------------------------------- |
-| Raspberry Pi    | Nativa (`./build/main`)   | `gdb` local o VS Code remoto SSH    | `as`, `ld`, `gdb`                      |
-| Host x86 + QEMU | `qemu-aarch64 build/main` | GDB stub `localhost:1234` + VS Code | `aarch64-linux-gnu-*`, `gdb-multiarch` |
+| Flujo                 | Ejecución                 | Depuración                          | Toolchain                              |
+| --------------------- | ------------------------- | ----------------------------------- | -------------------------------------- |
+| Raspberry Pi          | Nativa (`./build/main`)   | `gdb` local o VS Code remoto SSH    | `as`, `ld`, `gdb`                      |
+| Host x86 y x64 + QEMU | `qemu-aarch64 build/main` | GDB stub `localhost:1234` + VS Code | `aarch64-linux-gnu-*`, `gdb-multiarch` |
 
 - El uso de QEMU no altera los conceptos estudiados.
 
@@ -66,7 +66,7 @@ Cuando no haya hardware ARM, se trabaja con QEMU en host x86 sin cambiar las fue
 - `binutils` (as/ld)
 - `gdb`
 
-### Host x86
+### Host x86 y x64
 
 - `qemu-aarch64`
 - `gdb-multiarch`
@@ -77,8 +77,8 @@ Cuando no haya hardware ARM, se trabaja con QEMU en host x86 sin cambiar las fue
 Las mismas fuentes se ejecutan sin modificación tanto en Raspberry Pi como en QEMU.
 
 - `make` (o `make all`): ensambla y enlaza con símbolos de depuración.
-- `make run`: ejecuta el binario (nativo en Pi, emulado en x86).
-- `make gdb`: depuración (local en Pi, GDB stub vía QEMU en x86).
+- `make run`: ejecuta el binario (nativo en Pi, emulado en x86 y x64).
+- `make gdb`: depuración (local en Pi, GDB stub vía QEMU en x86 y x64).
 - `make clean`: limpia `build/`.
 - `make info`: muestra ayuda rápida.
     Detalles ampliados en `docs/makefiles-arm64-variants.md`.
