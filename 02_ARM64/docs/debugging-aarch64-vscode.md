@@ -106,7 +106,7 @@ gdb -ex "set architecture aarch64" -ex "target remote <ip>:1234" lessons/<leccio
 ### 3.1 Instala lo necesario en x86
 ```bash
 sudo apt update
-sudo apt install -y binutils-aarch64-linux-gnu qemu-user gdb-multiarch
+sudo apt install -y binutils-aarch64-linux-gnu qemu-user gdb-multiarch build-essential
 ```
 - Necesitas QEMU para ejecutar y un stub GDB para depurar.
 
