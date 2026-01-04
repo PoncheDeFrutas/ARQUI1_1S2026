@@ -39,21 +39,6 @@ _start:
     mov     x8, #64              // syscall write
     svc     #0                   // llamada al kernel
 
-
-    /* -----------------------------------------------------
-     * syscall: write(stdout, msg, msg_len)
-     *
-     * x0 = file descriptor (1 = stdout)
-     * x1 = dirección del buffer
-     * x2 = número de bytes
-     * x8 = número de syscall (64)
-     * ----------------------------------------------------- */
-    mov     x0, #1               // stdout
-    adr     x1, msg              // dirección del mensaje
-    mov     x2, msg_len          // longitud
-    mov     x8, #64              // syscall write
-    svc     #0                   // llamada al kernel
-
     /* -----------------------------------------------------
      * syscall: exit(0)
      *
