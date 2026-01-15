@@ -13,27 +13,20 @@
     ],
     "configurations": [
         {
-            "name": "Debug ARM64 (QEMU)",
+            "name": "Debug ARM64 (nativo)",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/lessons/${input:lesson}/build/main",
             "cwd": "${workspaceFolder}/lessons/${input:lesson}",
             "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb-multiarch",
-            "miDebuggerServerAddress": "localhost:1234",
+            "miDebuggerPath": "/usr/bin/gdb",
             "stopAtEntry": true,
-            "sourceFileMap": {
-                "${workspaceFolder}/lessons/${input:lesson}": "${workspaceFolder}/lessons/${input:lesson}"
-            },
             "setupCommands": [
                 {
                     "text": "-enable-pretty-printing"
                 },
                 {
                     "text": "set architecture aarch64"
-                },
-                {
-                    "text": "set breakpoint auto-hw on"
                 }
             ]
         }

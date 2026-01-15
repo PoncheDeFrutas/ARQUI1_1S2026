@@ -98,36 +98,11 @@ gdb ./build/main
 }
 ```
 
-### 2.4 Depuración remota en ARM64 con gdbserver
-
-- En la Pi/host ARM64:
-
-```bash
-gdbserver :1234 ./build/main
-
-```
-
-- Desde tu PC ARM64 (o VS Code con Remote SSH):
-
-```bash
-gdb -ex "set architecture aarch64" -ex "target remote <ip>:1234" lessons/<leccion>/build/main
-
-```
-
-- Ajuste `launch.json` para gdbserver (añade a la config anterior):
-
-```json
-    "miDebuggerServerAddress": "<ip-de-la-pi>:1234"
-```
-
-- Si no usas Remote SSH, agrega `pipeTransport` para tunelar por SSH.
-
-### 2.5 Checklist nativo ARM
+### 2.4 Checklist nativo ARM
 
 - `build/main` generado con `AS=as LD=ld` (o prefijo ARM64).
 - Se ejecuta con `./build/main` (sin QEMU).
 - GDB muestra registros ARM64 (`info registers`).
-- Si usas gdbserver, el puerto remoto responde.
 
 ## 3. Si tu host es x86 y x64 (usa QEMU user-mode)
 
