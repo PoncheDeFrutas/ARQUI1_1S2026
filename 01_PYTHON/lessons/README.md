@@ -6,6 +6,8 @@ Este directorio contiene las lecciones prácticas de Python enfocadas en el uso 
 
 - [Lección 00: Parpadeo y secuencia de LEDs](00_blink/README.md)
   Introducción al uso de `RPi.GPIO`, encendido/apagado de LEDs y secuencias simples.
+- [Lección 01: Botón, antirrebote y eventos](01_input_button/README.md)
+  Lectura de entradas digitales, pull-up/pull-down, antirrebote por software y callbacks.
 
 ## ¿Cómo usar estas lecciones?
 
