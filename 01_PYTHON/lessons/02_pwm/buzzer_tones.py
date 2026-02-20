@@ -9,7 +9,7 @@
 import RPi.GPIO as GPIO
 import time
 
-BUZZER_PIN = 23
+BUZZER_PIN = 12
 
 # Frecuencias de ejemplo (Hz)
 TONES = [262, 330, 392, 523]  # do, mi, sol, do

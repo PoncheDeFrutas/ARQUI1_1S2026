@@ -12,7 +12,7 @@ import time
 
 BUTTON_PIN = 17
 LED_PIN = 18
-DEBOUNCE_MS = 80  # tiempo mínimo entre pulsos válidos
+DEBOUNCE_MS = 200  # tiempo mínimo entre pulsos válidos
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
