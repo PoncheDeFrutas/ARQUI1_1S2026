@@ -18,6 +18,8 @@ Este directorio contiene las lecciones prácticas de Python enfocadas en el uso 
   Uso de pantalla LCD por I2C con `rpi_lcd`: texto, alineación y limpieza.
 - [Lección 06: Pantalla OLED I2C](06_oled_i2c/README.md)
   Uso de pantalla OLED SSD1306 por I2C: texto, contador y pixeles.
+- [Lección 07: Sensor ultrasonico HC-SR04](07_hc_sr04/README.md)
+  Medicion de distancia con GPIO y calculo por tiempo de eco.
 
 ## ¿Cómo usar estas lecciones?
 
