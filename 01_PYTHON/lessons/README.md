@@ -8,6 +8,10 @@ Este directorio contiene las lecciones prácticas de Python enfocadas en el uso 
   Introducción al uso de `RPi.GPIO`, encendido/apagado de LEDs y secuencias simples.
 - [Lección 01: Botón, antirrebote y eventos](01_input_button/README.md)
   Lectura de entradas digitales, pull-up/pull-down, antirrebote por software y callbacks.
+- [Lección 02: PWM y control analógico simulado](02_pwm/README.md)
+  Uso de PWM para brillo de LEDs, buzzer y servo; selección de frecuencia y duty.
+- [Lección 03: Tareas periódicas y temporizadores](03_timers_tasks/README.md)
+  Uso de hilos y timers para tareas en paralelo: heartbeat LED, sensor periódico y botón con callbacks.
 
 ## ¿Cómo usar estas lecciones?
 
