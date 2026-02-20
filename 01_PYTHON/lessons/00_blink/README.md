@@ -94,6 +94,25 @@ python3 example_02.py
 - Usa `try/except/finally` para salir limpio con `Ctrl+C`.
 - Ajusta los pines en el código según tu conexión real.
 
+## Qué puedes modificar
+
+- Pines: cambia los GPIO en `GPIO.setup(...)` y en la lista del barrido.
+- Velocidad: ajusta los `time.sleep(...)` para acelerar o ralentizar.
+- Patrón: cambia el orden de la lista de pines o enciende varios a la vez.
+- Modo de numeración: si cambias a `GPIO.BOARD`, actualiza todos los pines.
+
+## Errores comunes
+
+- Olvidar la resistencia del LED (riesgo de dañar el LED o el GPIO).
+- Mezclar `BCM` con numeración física sin ajustar los pines.
+- No ejecutar `GPIO.cleanup()` y dejar pines “ocupados”.
+- Conectar el LED al revés (no enciende).
+
+## Reto corto
+
+- Haz que el parpadeo tenga un patrón 0.2s encendido y 0.8s apagado.
+- En la secuencia, enciende dos LEDs a la vez (pares) y luego los impares.
+
 ## Siguiente paso
 
 - Cambiar el tiempo de `sleep` para acelerar o ralentizar.

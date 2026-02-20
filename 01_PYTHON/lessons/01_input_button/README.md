@@ -54,6 +54,25 @@ Detén con `Ctrl+C`; el programa limpia los GPIO en la salida.
 - `python3 -c "import RPi.GPIO as GPIO; print(GPIO.VERSION)"` funciona sin errores.
 - El botón está entre GPIO17 y GND; sin conexión flotante.
 
+## Qué puedes modificar
+
+- Pines: cambia `GPIO17` y `GPIO18` en el código si usas otros.
+- Antirrebote: ajusta el tiempo de debounce (ms) según el botón.
+- Lógica: modifica qué hace la pulsación corta/larga.
+- Pull-up/pull-down: cambia a `GPIO.PUD_DOWN` y re-cablea si lo necesitas.
+
+## Errores comunes
+
+- No usar pull-up/pull-down y dejar el pin flotante.
+- Cablear el botón a 3.3V cuando el código espera GND (o viceversa).
+- Usar `sleep` largos en el hilo principal y perder eventos.
+- Confundir BCM con numeración física.
+
+## Reto corto
+
+- Agrega un segundo botón y controla una segunda acción.
+- Cambia el umbral de pulsación larga y comprueba el efecto.
+
 ## Próximos pasos sugeridos
 
 - Leer dos botones y controlar dos acciones diferentes.

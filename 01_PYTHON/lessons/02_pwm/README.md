@@ -44,6 +44,25 @@ Detén con `Ctrl+C`; todos limpian GPIO en la salida.
 - Buzzer pasivo: cambia frecuencia para generar tonos; si es activo, frecuencia fija y sólo controla encendido.
 - Servo: rango típico 0.5–2.5 ms de pulso a 50 Hz (duty aprox. 2.5–12.5%); no exceder para evitar zumbido o daño.
 
+## Qué puedes modificar
+
+- Frecuencia PWM del LED (p. ej., 500–2000 Hz) y duty para brillo.
+- Frecuencia del buzzer (si es pasivo) para distintos tonos.
+- Rango del servo: limita los ángulos para evitar forzar el mecanismo.
+- Velocidad del barrido: ajusta el `sleep` entre pasos.
+
+## Errores comunes
+
+- Usar el rango de duty equivocado para el servo y generar zumbido.
+- Alimentar el servo desde el pin 3.3V de la Pi (no da corriente suficiente).
+- Elegir frecuencias muy bajas para LED y ver parpadeo.
+- Mezclar pines BCM/BOARD sin actualizar el código.
+
+## Reto corto
+
+- Cambia el barrido del servo para que haga “pausas” en 0°, 90° y 180°.
+- Haz un fade de LED de 0 a 100% y luego baja de 100 a 20%.
+
 ## Próximos pasos sugeridos
 
 - Combinar botón (Lección 01) para cambiar brillo/tono/posición.
