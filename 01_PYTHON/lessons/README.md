@@ -12,6 +12,8 @@ Este directorio contiene las lecciones prácticas de Python enfocadas en el uso 
   Uso de PWM para brillo de LEDs, buzzer y servo; selección de frecuencia y duty.
 - [Lección 03: Tareas periódicas y temporizadores](03_timers_tasks/README.md)
   Uso de hilos y timers para tareas en paralelo: heartbeat LED, sensor periódico y botón con callbacks.
+- [Lección 04: Sensor DHT11](04_dht11/README.md)
+  Lectura de temperatura y humedad con DHT11 usando `adafruit_dht`.
 
 ## ¿Cómo usar estas lecciones?
 
