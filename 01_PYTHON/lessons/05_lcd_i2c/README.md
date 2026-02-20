@@ -57,6 +57,7 @@ python3 -m pip install rpi-lcd
 - `lcd_basic.py`: escritura básica en dos líneas.
 - `lcd_alignment.py`: ejemplo de alineación izquierda/centro/derecha.
 - `lcd_multiline.py`: texto largo con manejo de salto de línea automático.
+- `lcd_screens.py`: rotación simple entre pantallas.
 
 ## Cómo ejecutar
 
@@ -66,6 +67,7 @@ Desde esta carpeta:
 python3 lcd_basic.py
 python3 lcd_alignment.py
 python3 lcd_multiline.py
+python3 lcd_screens.py
 ```
 
 Detén con `Ctrl+C` si el ejemplo está en bucle.

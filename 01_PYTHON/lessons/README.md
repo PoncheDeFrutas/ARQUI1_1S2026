@@ -14,6 +14,10 @@ Este directorio contiene las lecciones prácticas de Python enfocadas en el uso 
   Uso de hilos y timers para tareas en paralelo: heartbeat LED, sensor periódico y botón con callbacks.
 - [Lección 04: Sensor DHT11](04_dht11/README.md)
   Lectura de temperatura y humedad con DHT11 usando `adafruit_dht`.
+- [Lección 05: Pantalla LCD I2C](05_lcd_i2c/README.md)
+  Uso de pantalla LCD por I2C con `rpi_lcd`: texto, alineación y limpieza.
+- [Lección 06: Pantalla OLED I2C](06_oled_i2c/README.md)
+  Uso de pantalla OLED SSD1306 por I2C: texto, contador y pixeles.
 
 ## ¿Cómo usar estas lecciones?
 
