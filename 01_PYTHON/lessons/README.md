@@ -22,6 +22,8 @@ Este directorio contiene las lecciones prácticas de Python enfocadas en el uso 
   Medicion de distancia con GPIO y calculo por tiempo de eco.
 - [Lección 08: Sensor de color TCS3200](08_tcs3200/README.md)
   Lectura de frecuencia por filtros RGB y normalizacion basica.
+- [Lección 09: MQTT (MQTTX)](09_mqttx/README.md)
+  Conexion basica, publicar, suscribir y reconexion.
 
 ## ¿Cómo usar estas lecciones?
 
