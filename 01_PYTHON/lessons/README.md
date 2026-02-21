@@ -20,6 +20,8 @@ Este directorio contiene las lecciones prácticas de Python enfocadas en el uso 
   Uso de pantalla OLED SSD1306 por I2C: texto, contador y pixeles.
 - [Lección 07: Sensor ultrasonico HC-SR04](07_hc_sr04/README.md)
   Medicion de distancia con GPIO y calculo por tiempo de eco.
+- [Lección 08: Sensor de color TCS3200](08_tcs3200/README.md)
+  Lectura de frecuencia por filtros RGB y normalizacion basica.
 
 ## ¿Cómo usar estas lecciones?
 
