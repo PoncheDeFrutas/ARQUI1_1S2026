@@ -8,7 +8,7 @@ import time
 
 from paho.mqtt import client as mqtt_client
 
-BROKER = "broker.emqx.io"  # Cambia por tu broker
+BROKER = "broker.emqx.io"
 PORT = 1883
 CLIENT_ID = f"python-basic-{random.randint(0, 1000)}"
 USERNAME = None  # Ej: "user"
