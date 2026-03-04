@@ -36,7 +36,8 @@ def main():
     docs = [
         {"sensor": "raspi-01", "temp": 23.5, "room": "lab"},
         {"sensor": "raspi-02", "temp": 22.1, "room": "lab"},
-        {"sensor": "esp32-01", "temp": 27.9, "room": "oficina"},
+        {"sensor": "esp32-01", "room": "oficina"},
+        {"Asensor": "esp32-02", "temp": 26.3, "room": "oficina"},
     ]
 
     result = collection.insert_many(docs)
