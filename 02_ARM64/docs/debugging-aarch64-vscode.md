@@ -1,12 +1,19 @@
-# Depuracion ARM64 con VS Code (compatibilidad)
+# Depuracion ARM64 (AArch64) con VS Code: entornos nativo ARM y host x86 y x64 + QEMU
 
-Este archivo se mantiene por compatibilidad con enlaces anteriores.
+Archivo mantenido por compatibilidad con enlaces anteriores.
 
-La guia activa y actualizada esta en:
+La guia activa esta en [02_debugging.md](02_debugging.md), incluyendo seccion explicita de como editar `launch.json` segun el host.
 
-- [02_debugging.md](02_debugging.md)
+## Cambio clave en `launch.json`
 
-Tambien te puede servir:
+- **Nativo ARM64:** `miDebuggerPath` = `/usr/bin/gdb` y sin `miDebuggerServerAddress`.
+- **x86 y x64 + QEMU:** `miDebuggerPath` = `/usr/bin/gdb-multiarch` y `miDebuggerServerAddress` = `localhost:1234`.
 
-- [01_setup_and_workflows.md](01_setup_and_workflows.md)
-- [03_makefile_usage.md](03_makefile_usage.md)
+## Recomendacion practica
+
+Usa directamente las dos configuraciones ya incluidas en `02_ARM64/.vscode/launch.json`:
+
+- `Debug ARM64 (nativo)`
+- `Debug ARM64 (QEMU)`
+
+Solo selecciona la correcta al depurar. Si agregas lecciones nuevas, recuerda actualizar `inputs.options`.

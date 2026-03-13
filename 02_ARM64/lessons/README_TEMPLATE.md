@@ -27,6 +27,18 @@ lessons/XX_nombre_leccion/
 
 Si hay multiarchivo, agrega aqui los modulos (`algo.s`, `utils.s`, etc.) y el rol de cada uno.
 
+## Estandar para archivos `.s`
+
+Cada archivo ensamblador debe seguir este formato minimo:
+
+- Cabecera de bloque con nombre de leccion, archivo, toolchain y objetivo.
+- Separador de `Seccion de datos` (aunque no se use, indicar que no aplica).
+- Separador de `Seccion de codigo`.
+- Bloques comentados por pasos (que se hace y por que).
+- Comentarios en lineas clave (`mov`, `add`, `bl`, `svc`) con efecto en registros.
+
+Base de estilo: `../00_hello_world/main.s`.
+
 ## Flujo de trabajo
 
 Desde el directorio de la leccion:

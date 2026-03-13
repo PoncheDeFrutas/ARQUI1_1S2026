@@ -1,16 +1,33 @@
 /* =========================================================
- * sumar.s
- * Función: sumar(a, b)
+ * Leccion 99 - Prueba multiarchivo ARM64 (Linux)
+ * Archivo: add.s
  *
- * Convención AArch64:
- *   x0 -> primer argumento
- *   x1 -> segundo argumento
- *   x0 <- valor de retorno
+ * Ensamblador: aarch64-linux-gnu-as
+ * Enlazador : aarch64-linux-gnu-ld
+ * Ejecucion : qemu-aarch64
+ *
+ * No usa libc. Define funcion auxiliar sum(a, b).
  * ========================================================= */
 
+/* ---------------------------------------------------------
+ * Seccion de datos
+ * ---------------------------------------------------------
+ * Sin datos estaticos para esta funcion.
+ * --------------------------------------------------------- */
+
+/* ---------------------------------------------------------
+ * Seccion de codigo
+ * --------------------------------------------------------- */
 .section .text
 .global sum
 
 sum:
-    add x0, x0, x1   // x0 = x0 + x1
-    ret              // regresar al llamador
+    /* -----------------------------------------------------
+     * Funcion: sum(a, b)
+     * ABI AArch64:
+     *   x0 = argumento 1 (a)
+     *   x1 = argumento 2 (b)
+     *   x0 = retorno (a + b)
+     * ----------------------------------------------------- */
+    add     x0, x0, x1         // x0 = x0 + x1
+    ret                        // vuelve al llamador (main.s)

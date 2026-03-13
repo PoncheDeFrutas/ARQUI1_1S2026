@@ -1,173 +1,73 @@
-# Lección 00 – Hello World en ARM64 (Linux)
+# Leccion 00 - Hello World en ARM64 (Linux)
 
-## Objetivo de la lección
+## Objetivo de aprendizaje
 
-En esta primera lección aprenderás a ejecutar tu **primer programa en ensamblador AArch64 (ARM64)** sobre Linux, **sin usar gcc**, utilizando únicamente:
+Ejecutar el primer programa en ensamblador AArch64 en Linux sin libc, usando syscalls directas para escribir en pantalla y finalizar el proceso.
 
-- `as` (ensamblador)
-- `ld` (enlazador)
-- `qemu-aarch64` (emulación)
+## Prerrequisitos
 
-El programa mostrará el texto **"Hello, world"** en pantalla usando **syscalls de Linux**, y luego finalizará correctamente.
+- Entorno configurado segun `../../docs/01_setup_and_workflows.md`.
+- Conocer comandos basicos de terminal.
+- Tener disponible `make` y toolchain de ARM64 (nativa o cruzada).
 
----
+## Conceptos nuevos (3-5 maximo)
 
-## Qué aprenderás
+- Punto de entrada real `_start`.
+- Convencion de syscalls Linux en ARM64 (`x0-x5`, `x8`, `svc #0`).
+- Uso de secciones `.data` y `.text`.
+- Ensamblado y enlace con `as` y `ld`.
 
-Al finalizar esta lección serás capaz de:
-
-- Entender el punto de entrada `_start` en programas ARM64
-- Usar syscalls en Linux AArch64
-- Comprender el rol de los registros principales en syscalls
-- Ensamblar, enlazar y ejecutar un binario ARM64
-- Ver el resultado usando QEMU
-
----
-
-## Conceptos clave introducidos
-
-### 1. Punto de entrada: `_start`
-
-En programas sin libc, **`_start` es el punto de entrada real** del programa. Linux comienza la ejecución aquí, no en `main`.
-
-### 2. Syscalls en ARM64 Linux
-
-Las llamadas al sistema permiten interactuar con el kernel (escribir en pantalla, salir del programa, etc.).
-
-En ARM64:
-
-- El **número de syscall** se coloca en el registro `x8`
-- Los **argumentos** se pasan en `x0`–`x5`
-- La instrucción `svc #0` invoca al kernel
-
----
-
-## Syscalls utilizadas en esta lección
-
-### `write`
-
-Permite escribir datos en un descriptor de archivo.
-
-| Registro | Contenido                    |
-| -------- | ---------------------------- |
-| `x0`     | File descriptor (1 = stdout) |
-| `x1`     | Dirección del buffer         |
-| `x2`     | Número de bytes a escribir   |
-| `x8`     | Número de syscall (`64`)     |
-
-### `exit`
-
-Finaliza el programa.
-
-| Registro | Contenido                |
-| -------- | ------------------------ |
-| `x0`     | Código de salida         |
-| `x8`     | Número de syscall (`93`) |
-
----
-
-## Archivos de esta lección
+## Archivos de la leccion
 
 ```text
 lessons/00_hello_world/
-├── README.md
-├── main.s
-└── Makefile
+|- README.md
+|- main.s
+`- Makefile
 ```
 
-- `main.s`: código ensamblador ARM64
-- `Makefile`: automatiza ensamblado, enlace y ejecución
+## Flujo de trabajo
 
----
-
-## Cómo construir el programa
-
-Desde el directorio de la lección:
+Desde el directorio de la leccion:
 
 ```bash
 make
-```
-
-Esto ejecuta:
-
-1. Ensamblado con `aarch64-linux-gnu-as`
-2. Enlace con `aarch64-linux-gnu-ld`
-
----
-
-## Cómo ejecutar el programa
-
-```bash
 make run
+make gdb
 ```
 
-Salida esperada:
+## Salida esperada
 
 ```text
 Hello, world
 ```
 
----
+## Verificacion (checklist)
 
-## (Opcional) Ejecutar en modo depuración
-
-Para ejecutar el programa bajo QEMU con soporte para GDB:
-
-```bash
-make gdb
-```
-
-Esto dejará el programa detenido esperando que GDB se conecte.
-
----
-
-## Qué observar en el código
-
-Al revisar `main.s`, presta atención a:
-
-- Uso de `.data` para almacenar el mensaje
-- Uso de `.text` para el código
-- Carga de direcciones con `adr`
-- Uso explícito de registros `x0`, `x1`, `x2`, `x8`
-- La instrucción `svc #0`
-
-No te preocupes si aún no entiendes cada instrucción: **las siguientes lecciones profundizarán en cada concepto**.
-
----
+- `build/main` se genera sin error.
+- `make run` imprime `Hello, world`.
+- En depuracion puedes detenerte en `_start`.
+- Identificas en `main.s` el uso de `x0`, `x1`, `x2`, `x8`.
 
 ## Errores comunes
 
-- Olvidar definir `_start`
-- Usar números de syscall incorrectos
-- Confundir registros `x` con `w`
-- Esperar que exista `main`
+- No declarar `_start` como simbolo global.
+- Colocar un numero de syscall incorrecto en `x8`.
+- Confundir registros `wN` (32 bits) con `xN` (64 bits).
+- No actualizar longitud del mensaje al cambiar el texto.
 
----
+## Ejercicios propuestos
 
-## Próxima lección
+1. Cambia el mensaje y ajusta su longitud correctamente.
+2. Imprime dos lineas separadas con dos llamadas `write`.
+3. Finaliza con codigo de salida distinto de cero y verificable en shell.
 
-### Lección 01 – Registros en ARM64
+## Criterios de evaluacion sugeridos
 
-Exploraremos:
+- **Correctitud:** el programa escribe y termina correctamente.
+- **Disciplina de registros:** usa registros de syscall en el lugar correcto.
+- **Depuracion:** demuestra inspeccion de registros en `_start`.
 
-- Registros `x0–x30`
-- Diferencia entre `xN` y `wN`
-- Convenciones básicas de uso
+## Proxima leccion
 
----
-
-## Nota educativa
-
-Este proyecto está diseñado con fines **educativos**.
-
-Todo el código:
-
-- Es explícito
-- Evita dependencias innecesarias
-- Prioriza claridad sobre optimización
-
-Si vienes de x86/x86_64 o de lenguajes de alto nivel, tómate tu tiempo: ARM64 tiene un diseño limpio y coherente que vale la pena aprender desde la base.
-
----
-
-Cuando estés listo, continúa con la siguiente lección.
+- [Leccion 01 - Registros y mov](../01_registers_and_mov/README.md)

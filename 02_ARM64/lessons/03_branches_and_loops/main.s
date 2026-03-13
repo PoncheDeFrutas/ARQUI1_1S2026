@@ -1,5 +1,5 @@
 /* =========================================================
- * Leccion 99 - Prueba multiarchivo ARM64 (Linux)
+ * Leccion 03 - Branches y loops en ARM64 (Linux)
  * Archivo: main.s
  *
  * Ensamblador: aarch64-linux-gnu-as
@@ -7,13 +7,13 @@
  * Ejecucion : qemu-aarch64
  *
  * No usa libc, solo syscalls de Linux.
- * Este archivo contiene _start y llama a sum (add.s).
+ * Objetivo: controlar flujo con loops y branches.
  * ========================================================= */
 
 /* ---------------------------------------------------------
  * Seccion de datos
  * ---------------------------------------------------------
- * Esta practica no necesita datos en memoria estatica.
+ * Esta leccion trabaja solo con registros.
  * --------------------------------------------------------- */
 
 /* ---------------------------------------------------------
@@ -22,31 +22,47 @@
 .section .text
 .global _start
 
-.extern sum                    // funcion definida en add.s
-
 _start:
     /* -----------------------------------------------------
-     * 1) Preparar argumentos para sum(a, b)
+     * 1) Inicializar contador y acumulador
      * -----------------------------------------------------
-     * ABI AArch64:
-     *   x0 = argumento 1
-     *   x1 = argumento 2
+     * x1 = i (contador)
+     * x2 = suma acumulada
      * ----------------------------------------------------- */
-    mov     x0, #5             // a = 5
-    mov     x1, #10            // b = 10
+    mov     x1, #1               // i = 1
+    mov     x2, #0               // suma = 0
+
+loop_start:
+    /* -----------------------------------------------------
+     * 2) Cuerpo del loop: suma += i
+     * ----------------------------------------------------- */
+    add     x2, x2, x1           // suma = suma + i
+    add     x1, x1, #1           // i++
 
     /* -----------------------------------------------------
-     * 2) Llamar funcion externa
-     * -----------------------------------------------------
-     * bl guarda retorno en x30 (lr) y salta a sum.
-     * La funcion devuelve resultado en x0.
+     * 3) Condicion del loop: repetir mientras i <= 5
      * ----------------------------------------------------- */
-    bl      sum                // x0 = 15 al retornar
+    cmp     x1, #5
+    b.le    loop_start
 
     /* -----------------------------------------------------
-     * 3) Finalizar programa con syscall exit(x0)
+     * 4) Validar resultado final
      * -----------------------------------------------------
-     * Reusamos el resultado como codigo de salida.
+     * Se espera suma = 15 (1+2+3+4+5).
      * ----------------------------------------------------- */
-    mov     x8, #93            // syscall exit
-    svc     #0                 // llamada al kernel
+    cmp     x2, #15
+    b.eq    ok
+
+error:
+    mov     x0, #1               // codigo de error
+    b       exit_program
+
+ok:
+    mov     x0, #0               // codigo de exito
+
+exit_program:
+    /* -----------------------------------------------------
+     * 5) Finalizar programa
+     * ----------------------------------------------------- */
+    mov     x8, #93              // syscall exit
+    svc     #0

@@ -7,6 +7,18 @@ Indice de practicas de ensamblador ARMv8 del curso.
 - [00_hello_world](00_hello_world/README.md)
   Primer programa en ARM64 con syscalls (`write`, `exit`) y flujo de build basico.
 
+- [01_registers_and_mov](01_registers_and_mov/README.md)
+  Uso de registros `xN`/`wN`, carga de inmediatos con `mov` y salida por codigo de retorno.
+
+- [02_alu_and_flags](02_alu_and_flags/README.md)
+  Operaciones de ALU (`add`, `sub`) y uso de `cmp` con banderas para control condicional.
+
+- [03_branches_and_loops](03_branches_and_loops/README.md)
+  Estructuras de repeticion con contador, acumulador y branches condicionales.
+
+- [04_memory_load_store](04_memory_load_store/README.md)
+  Primer acceso a memoria con `.data`, `ldr`, `str` y validacion de resultados.
+
 - `99_test`
   Leccion de pruebas internas multiarchivo para validar flujo de ensamblado/enlace.
 

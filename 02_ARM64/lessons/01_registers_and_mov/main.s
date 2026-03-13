@@ -1,5 +1,5 @@
 /* =========================================================
- * Leccion 99 - Prueba multiarchivo ARM64 (Linux)
+ * Leccion 01 - Registros y mov en ARM64 (Linux)
  * Archivo: main.s
  *
  * Ensamblador: aarch64-linux-gnu-as
@@ -7,13 +7,14 @@
  * Ejecucion : qemu-aarch64
  *
  * No usa libc, solo syscalls de Linux.
- * Este archivo contiene _start y llama a sum (add.s).
+ * Objetivo: practicar uso de registros xN/wN y mov.
  * ========================================================= */
 
 /* ---------------------------------------------------------
  * Seccion de datos
  * ---------------------------------------------------------
- * Esta practica no necesita datos en memoria estatica.
+ * Esta leccion no requiere datos estaticos en .data.
+ * Todas las constantes se cargan como inmediatos.
  * --------------------------------------------------------- */
 
 /* ---------------------------------------------------------
@@ -22,31 +23,27 @@
 .section .text
 .global _start
 
-.extern sum                    // funcion definida en add.s
-
 _start:
     /* -----------------------------------------------------
-     * 1) Preparar argumentos para sum(a, b)
-     * -----------------------------------------------------
-     * ABI AArch64:
-     *   x0 = argumento 1
-     *   x1 = argumento 2
+     * 1) Cargar valores inmediatos en registros de trabajo
      * ----------------------------------------------------- */
-    mov     x0, #5             // a = 5
-    mov     x1, #10            // b = 10
+    mov     x1, #5               // operando A
+    mov     x2, #10              // operando B
 
     /* -----------------------------------------------------
-     * 2) Llamar funcion externa
+     * 2) Operar sobre registros (suma en 64 bits)
      * -----------------------------------------------------
-     * bl guarda retorno en x30 (lr) y salta a sum.
-     * La funcion devuelve resultado en x0.
+     * El resultado queda en x3 para poder inspeccionarlo
+     * en depuracion sin afectar el codigo de salida.
      * ----------------------------------------------------- */
-    bl      sum                // x0 = 15 al retornar
+    add     x3, x1, x2           // x3 = 5 + 10 = 15
 
     /* -----------------------------------------------------
-     * 3) Finalizar programa con syscall exit(x0)
+     * 3) Finalizar programa con syscall exit(0)
      * -----------------------------------------------------
-     * Reusamos el resultado como codigo de salida.
+     * x0 = codigo de salida
+     * x8 = numero de syscall (93 = exit)
      * ----------------------------------------------------- */
-    mov     x8, #93            // syscall exit
-    svc     #0                 // llamada al kernel
+    mov     x0, #0               // salida exitosa
+    mov     x8, #93              // syscall exit
+    svc     #0                   // llamada al kernel
