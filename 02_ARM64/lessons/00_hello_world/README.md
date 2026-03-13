@@ -69,7 +69,7 @@ Finaliza el programa.
 ## Archivos de esta lección
 
 ```text
-lessons/00-hello-world/
+lessons/00_hello_world/
 ├── README.md
 ├── main.s
 └── Makefile
@@ -114,7 +114,7 @@ Hello, world
 Para ejecutar el programa bajo QEMU con soporte para GDB:
 
 ```bash
-make debug
+make gdb
 ```
 
 Esto dejará el programa detenido esperando que GDB se conecte.
@@ -166,7 +166,7 @@ Todo el código:
 - Evita dependencias innecesarias
 - Prioriza claridad sobre optimización
 
-Si vienes de x86 y x64_64 o de lenguajes de alto nivel, tómate tu tiempo: ARM64 tiene un diseño limpio y coherente que vale la pena aprender desde la base.
+Si vienes de x86/x86_64 o de lenguajes de alto nivel, tómate tu tiempo: ARM64 tiene un diseño limpio y coherente que vale la pena aprender desde la base.
 
 ---
 

@@ -1,115 +1,44 @@
-# Laboratorio de Programación en Ensamblador ARM64 (AArch64) en Linux
+# 02_ARM64 - Ensamblador ARMv8 (AArch64) para IoT
 
-Última revisión: 2025-03-17
+Esta seccion contiene la ruta de aprendizaje de ensamblador ARM64 del curso, orientada a Raspberry Pi y sistemas IoT. El enfoque es progresivo: primero fundamentos de arquitectura y memoria en Linux user-mode; despues estructuras de datos, arreglos y matrices; finalmente base para MMIO/GPIO.
 
-## 1. Introducción / Propósito
+## Empieza aqui
 
-Proyecto académico para ejecutar y depurar programas en ensamblador ARM64 **principalmente en Raspberry Pi (ARM64)** con Linux. Se estudian:
+1. Lee la [ruta formativa completa](docs/00_curriculum_path.md).
+2. Configura tu entorno con la [guia de setup y flujos](docs/01_setup_and_workflows.md).
+3. Revisa el [indice de lecciones](lessons/README.md).
+4. Usa la [guia de depuracion](docs/02_debugging.md) cuando ejecutes practicas.
 
-- Ensamblador ARM64 (GAS)
-- ABI AArch64
-- Syscalls Linux
-- Stack, registros y memoria
+## Documentacion por tema
 
-Cuando no haya hardware ARM, se trabaja con QEMU en host x86 y x64 sin cambiar las fuentes. Futuras fases incorporarán acceso a memoria mapeada, GPIO en Raspberry Pi e interacción directa con hardware.
+- [00 - Ruta de aprendizaje ARM64](docs/00_curriculum_path.md)
+- [01 - Setup y flujos (Raspberry Pi o QEMU)](docs/01_setup_and_workflows.md)
+- [02 - Depuracion con GDB y VS Code](docs/02_debugging.md)
+- [03 - Uso de Makefiles y plantillas](docs/03_makefile_usage.md)
+- [04 - Referencia rapida AArch64](docs/04_aarch64_quick_reference.md)
+- [05 - Memoria y tipos de datos](docs/05_memory_and_data_types.md)
+- [06 - Arreglos y matrices en ARM64](docs/06_arrays_and_matrices.md)
 
-## 2. Alcance actual
+## Estructura de la carpeta
 
-- ARM64 user-mode sobre Linux-
-- Ensamblador GNU (GAS)
-- Syscalls Linux
-- Análisis de ejecución a bajo nivel
-- No bare-metal
-- No acceso directo a GPIO
-- No RTOS / microcontroladores
-    El acceso a hardware (GPIO/MMIO) se abordará en fases posteriores.
+- `lessons/`: practicas y ejercicios por nivel.
+- `docs/`: guias tecnicas y pedagogicas.
+- `.vscode/`: configuraciones de depuracion.
+- `tools/makefile-templates/`: plantillas de Makefile para host ARM64 y host x86_64 + QEMU.
 
-## 3. ¿Qué leer primero? (según rol)
+## Comandos base en casi todas las lecciones
 
-| Rol        | Lecturas sugeridas                                         | Tiempo estimado |
-| ---------- | ---------------------------------------------------------- | --------------- |
-| Estudiante | README (secciones 1–8), `docs/debugging-aarch64-vscode.md` | 20–30 min       |
-| Instructor | README completo, `docs/makefiles-arm64-variants.md`, guías | 30–40 min       |
-
-## 4. Estructura del repositorio
-
-- `lessons/`: prácticas progresivas. Las primeras son de arquitectura; futuras podrán incluir interacción con hardware.
-- `docs/`: guías (depuración VS Code, Makefiles, variantes ARM64).
-- `.vscode/`: configuración de depuración.
-- `tools/`: utilidades varias.
-
-## 5. Organización de las lecciones
-
-- Lecciones iniciales sin privilegios especiales; el código corre como proceso de usuario.
-- Misma estructura de comandos (`make`, `make run`, `make gdb`, `make clean`) en todas las lecciones para seguridad y portabilidad.
-- Cada lección debe declarar objetivos de aprendizaje, conceptos cubiertos y un breve checklist de verificación.
-
-## 6. Plataformas soportadas
-
-| Flujo                 | Ejecución                 | Depuración                          | Toolchain                              |
-| --------------------- | ------------------------- | ----------------------------------- | -------------------------------------- |
-| Raspberry Pi          | Nativa (`./build/main`)   | `gdb` local o VS Code remoto SSH    | `as`, `ld`, `gdb`                      |
-| Host x86 y x64 + QEMU | `qemu-aarch64 build/main` | GDB stub `localhost:1234` + VS Code | `aarch64-linux-gnu-*`, `gdb-multiarch` |
-
-- El uso de QEMU no altera los conceptos estudiados.
-
-## 7. Requisitos del sistema
-
-### Generales
-
-- Linux
-- Visual Studio Code + extensión **C/C++**
-
-### Raspberry Pi (ARM64)
-
-- OS Linux ARM64
-- `binutils` (as/ld)
-- `gdb`
-
-### Host x86 y x64
-
-- `qemu-aarch64`
-- `gdb-multiarch`
-- Toolchain cruzado `aarch64-linux-gnu-*`
-
-## 8. Compilación y ejecución (visión general)
-
-Las mismas fuentes se ejecutan sin modificación tanto en Raspberry Pi como en QEMU.
-
-- `make` (o `make all`): ensambla y enlaza con símbolos de depuración.
-- `make run`: ejecuta el binario (nativo en Pi, emulado en x86 y x64).
-- `make gdb`: depuración (local en Pi, GDB stub vía QEMU en x86 y x64).
+- `make`: ensambla y enlaza.
+- `make run`: ejecuta el binario (nativo o con QEMU segun Makefile).
+- `make gdb`: prepara depuracion (GDB local o QEMU stub).
 - `make clean`: limpia `build/`.
-- `make info`: muestra ayuda rápida.
-    Detalles ampliados en `docs/makefiles-arm64-variants.md`.
+- `make info`: muestra ayuda rapida.
 
-## 9. Depuración con VS Code
+## Alcance actual
 
-- Raspberry Pi: depuración local o remota (SSH) usando `cppdbg`.
-- QEMU: stub GDB (`localhost:1234`) levantado por `make gdb`.
-- Pasos completos en `docs/debugging-aarch64-vscode.md`.
+- ARM64 en Linux user-mode.
+- Syscalls y ABI AArch64.
+- Memoria, stack, registros y funciones.
+- Sin bare-metal y sin GPIO de bajo nivel por ahora.
 
-## 10. Progresión futura del laboratorio
-
-```mermaid
-flowchart LR
-    F1[Fase 1<br/>ARM64 + Linux user-mode] --> F2[Fase 2<br/>Memoria mapeada / direcciones]
-    F2 --> F3[Fase 3<br/>GPIO en Raspberry Pi]
-    F3 --> F4[Fase 4 opcional<br/>Bare metal / RTOS]
-```
-
-## 11. Documentación técnica
-
-- [Depuración VS Code](docs/debugging-aarch64-vscode.md)
-- [Makefiles y variantes (QEMU y nativo)](docs/makefiles-arm64-variants.md)
-- GPIO / MMIO: futuro (aún no incluido)
-
-## 12. Lecciones disponibles
-
-- `lessons/00_hello_world`: arquitectura básica, flujo mínimo.
-- `lessons/99_test`: flujo multi-fuente, pruebas y modularidad.
-- Futuras lecciones: se irán agregando (mixtas / hardware directo).
-
-## 13. Notas pedagógicas
-
-El laboratorio comienza en modo usuario para asegurar comprensión de la arquitectura antes de interactuar con hardware. La alternativa QEMU permite practicar sin hardware físico; en Raspberry Pi el mismo código corre nativamente.
+La meta didactica es que el estudiante domine direccionamiento y uso eficiente de memoria antes de pasar a operaciones con datos complejos y control de perifericos.

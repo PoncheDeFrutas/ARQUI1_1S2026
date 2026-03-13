@@ -10,5 +10,5 @@ Incluye materiales, ejemplos y documentación de apoyo, además de referencias a
 
 - [01_PYTHON](01_PYTHON/README.md)
   Contenido de Python para IoT con GPIO, documentación y lecciones prácticas.
-- 02_ARM64
-  Contenido de ensamblador ARMv8 y arquitectura ARM64.
+- [02_ARM64](02_ARM64/README.md)
+  Contenido de ensamblador ARMv8/AArch64, ruta formativa y laboratorio para IoT.
