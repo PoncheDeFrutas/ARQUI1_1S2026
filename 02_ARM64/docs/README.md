@@ -10,6 +10,10 @@ Indice rapido de documentos de la seccion ARM64.
 - [05_memory_and_data_types.md](05_memory_and_data_types.md)
 - [06_arrays_and_matrices.md](06_arrays_and_matrices.md)
 
+Plantillas didacticas:
+
+- [../lessons/README_TEMPLATE.md](../lessons/README_TEMPLATE.md)
+
 Archivos de compatibilidad (enlaces historicos):
 
 - [debugging-aarch64-vscode.md](debugging-aarch64-vscode.md)

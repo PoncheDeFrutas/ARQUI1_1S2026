@@ -10,6 +10,11 @@ Indice de practicas de ensamblador ARMv8 del curso.
 - `99_test`
   Leccion de pruebas internas multiarchivo para validar flujo de ensamblado/enlace.
 
+## Plantilla estandar para nuevas lecciones
+
+- [README_TEMPLATE.md](README_TEMPLATE.md)
+  Estructura base recomendada para documentar cada leccion (objetivo, prerrequisitos, comandos, checklist, errores comunes y ejercicios).
+
 ## Ruta recomendada para nuevas lecciones
 
 1. 00_hello_world
