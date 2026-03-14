@@ -19,6 +19,9 @@ Indice de practicas de ensamblador ARMv8 del curso.
 - [04_memory_load_store](04_memory_load_store/README.md)
   Primer acceso a memoria con `.data`, `ldr`, `str` y validacion de resultados.
 
+- [05_stack_and_functions](05_stack_and_functions/README.md)
+  Llamadas a funcion con `bl/ret`, prologo/epilogo y preservacion de registros.
+
 - `99_test`
   Leccion de pruebas internas multiarchivo para validar flujo de ensamblado/enlace.
 

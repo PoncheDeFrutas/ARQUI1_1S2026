@@ -11,6 +11,7 @@
                 "02_alu_and_flags",
                 "03_branches_and_loops",
                 "04_memory_load_store",
+                "05_stack_and_functions",
                 "99_test"
             ]
         }
