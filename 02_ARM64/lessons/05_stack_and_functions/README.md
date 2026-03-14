@@ -158,4 +158,4 @@ Mini-guia de observacion en GDB:
 
 ## Proxima leccion
 
-- Leccion 06 - ABI y multiarchivo.
+- [Leccion 06 - ABI y multiarchivo](../06_abi_and_multifile/README.md)

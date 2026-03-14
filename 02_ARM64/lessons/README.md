@@ -22,6 +22,9 @@ Indice de practicas de ensamblador ARMv8 del curso.
 - [05_stack_and_functions](05_stack_and_functions/README.md)
   Llamadas a funcion con `bl/ret`, prologo/epilogo y preservacion de registros.
 
+- [06_abi_and_multifile](06_abi_and_multifile/README.md)
+  Convencion ABI entre archivos, caller/callee-saved y funciones leaf/no-leaf.
+
 - `99_test`
   Leccion de pruebas internas multiarchivo para validar flujo de ensamblado/enlace.
 

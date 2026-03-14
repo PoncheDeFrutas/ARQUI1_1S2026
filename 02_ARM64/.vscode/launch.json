@@ -12,6 +12,7 @@
                 "03_branches_and_loops",
                 "04_memory_load_store",
                 "05_stack_and_functions",
+                "06_abi_and_multifile",
                 "99_test"
             ]
         }
