@@ -25,6 +25,9 @@ Indice de practicas de ensamblador ARMv8 del curso.
 - [06_abi_and_multifile](06_abi_and_multifile/README.md)
   Convencion ABI entre archivos, caller/callee-saved y funciones leaf/no-leaf.
 
+- [07_data_types_sign_zero_extension](07_data_types_sign_zero_extension/README.md)
+  Demos de zero/sign extension y efecto de usar registros `wN` sobre `xN`.
+
 - `99_test`
   Leccion de pruebas internas multiarchivo para validar flujo de ensamblado/enlace.
 

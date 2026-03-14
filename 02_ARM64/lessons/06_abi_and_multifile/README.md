@@ -103,4 +103,4 @@ x/4gx $sp
 
 ## Proxima leccion
 
-- Leccion 07 - tipos de datos y extension de signo/cero.
+- [Leccion 07 - tipos de datos y extension de signo/cero](../07_data_types_sign_zero_extension/README.md)
