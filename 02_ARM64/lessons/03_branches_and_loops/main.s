@@ -11,6 +11,17 @@
  * ========================================================= */
 
 /* ---------------------------------------------------------
+ * Registros usados en este archivo
+ * ---------------------------------------------------------
+ * x0  = fd para read/write, bytes leidos y codigo de salida
+ * x1  = direccion de buffer para read/write
+ * x2  = cantidad de bytes para read/write
+ * x8  = numero de syscall Linux ARM64
+ * x10 = base de opt_buf
+ * w11 = primer caracter leido (opcion de menu)
+ * --------------------------------------------------------- */
+
+/* ---------------------------------------------------------
  * Seccion de datos
  * --------------------------------------------------------- */
 .section .data
@@ -42,22 +53,32 @@ opt_buf:
 
 _start:
     /* -----------------------------------------------------
-     * 1) Mostrar menu en stdout
+     * syscall: write(stdout, menu_msg, menu_msg_len)
+     *
+     * x0 = file descriptor (1 = stdout)
+     * x1 = direccion del buffer
+     * x2 = numero de bytes
+     * x8 = numero de syscall (64)
      * ----------------------------------------------------- */
-    mov     x0, #1
-    adr     x1, menu_msg
-    mov     x2, menu_msg_len
-    mov     x8, #64
-    svc     #0
+    mov     x0, #1               // stdout
+    adr     x1, menu_msg         // buffer del menu
+    mov     x2, menu_msg_len     // bytes a escribir
+    mov     x8, #64              // syscall write
+    svc     #0                   // llamada al kernel
 
     /* -----------------------------------------------------
-     * 2) Leer opcion desde stdin
+     * syscall: read(stdin, opt_buf, 2)
+     *
+     * x0 = file descriptor (0 = stdin)
+     * x1 = direccion del buffer
+     * x2 = numero de bytes maximos
+     * x8 = numero de syscall (63)
      * ----------------------------------------------------- */
-    mov     x0, #0
-    adr     x1, opt_buf
-    mov     x2, #2
-    mov     x8, #63
-    svc     #0
+    mov     x0, #0               // stdin
+    adr     x1, opt_buf          // buffer para opcion
+    mov     x2, #2               // leer 1 char + posible \n
+    mov     x8, #63              // syscall read
+    svc     #0                   // llamada al kernel
 
     cmp     x0, #0
     b.eq    run_demo_1
@@ -87,18 +108,30 @@ run_demo_3:
 
 invalid_option:
     /* -----------------------------------------------------
-     * 3) Manejo de opcion invalida
+     * syscall: write(stdout, invalid_msg, invalid_msg_len)
+     *
+     * x0 = file descriptor (1 = stdout)
+     * x1 = direccion del buffer
+     * x2 = numero de bytes
+     * x8 = numero de syscall (64)
      * ----------------------------------------------------- */
-    mov     x0, #1
-    adr     x1, invalid_msg
-    mov     x2, invalid_msg_len
-    mov     x8, #64
-    svc     #0
+    mov     x0, #1               // stdout
+    adr     x1, invalid_msg      // mensaje de error
+    mov     x2, invalid_msg_len  // longitud del mensaje
+    mov     x8, #64              // syscall write
+    svc     #0                   // llamada al kernel
+
+    /* -----------------------------------------------------
+     * Preparar codigo de salida para opcion invalida
+     * ----------------------------------------------------- */
     mov     x0, #9
 
 exit_program:
     /* -----------------------------------------------------
-     * 4) Finalizar programa con exit(x0)
+     * syscall: exit(x0)
+     *
+     * x0 = codigo de salida
+     * x8 = numero de syscall (93)
      * ----------------------------------------------------- */
-    mov     x8, #93
-    svc     #0
+    mov     x8, #93              // syscall exit
+    svc     #0                   // llamada al kernel

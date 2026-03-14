@@ -10,6 +10,15 @@
  * ========================================================= */
 
 /* ---------------------------------------------------------
+ * Registros usados en este archivo
+ * ---------------------------------------------------------
+ * x0 = argumento 1 de syscall (fd o codigo de salida)
+ * x1 = argumento 2 de syscall (direccion de buffer)
+ * x2 = argumento 3 de syscall (cantidad de bytes)
+ * x8 = numero de syscall Linux ARM64
+ * --------------------------------------------------------- */
+
+/* ---------------------------------------------------------
  * Sección de datos
  * --------------------------------------------------------- */
 .section .data

@@ -11,6 +11,18 @@
  * ========================================================= */
 
 /* ---------------------------------------------------------
+ * Registros usados en este archivo
+ * ---------------------------------------------------------
+ * x10 = direccion base del bloque de datos (&a)
+ * x1  = valor leido de a
+ * x2  = valor leido de b
+ * x3  = resultado calculado (a + b)
+ * x4  = resultado releido desde memoria
+ * x0  = codigo de salida para exit
+ * x8  = numero de syscall Linux ARM64
+ * --------------------------------------------------------- */
+
+/* ---------------------------------------------------------
  * Seccion de datos
  * ---------------------------------------------------------
  * Variables de 64 bits alineadas para acceso sencillo.
@@ -63,15 +75,24 @@ _start:
     b.eq    ok
 
 error:
+    /* -----------------------------------------------------
+     * Rama de error: validacion fallida
+     * ----------------------------------------------------- */
     mov     x0, #1              // codigo de error
     b       exit_program
 
 ok:
+    /* -----------------------------------------------------
+     * Rama de exito: validacion correcta
+     * ----------------------------------------------------- */
     mov     x0, #0              // codigo de exito
 
 exit_program:
     /* -----------------------------------------------------
-     * 5) Finalizar programa
+     * syscall: exit(x0)
+     *
+     * x0 = codigo de salida
+     * x8 = numero de syscall (93)
      * ----------------------------------------------------- */
     mov     x8, #93             // syscall exit
-    svc     #0
+    svc     #0                  // llamada al kernel

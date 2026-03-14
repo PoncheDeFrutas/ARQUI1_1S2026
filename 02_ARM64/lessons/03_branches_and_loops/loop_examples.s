@@ -10,6 +10,14 @@
  * ========================================================= */
 
 /* ---------------------------------------------------------
+ * Registros usados en este archivo
+ * ---------------------------------------------------------
+ * x0 = codigo de retorno de cada demo (0 = ok, !=0 error)
+ * x1 = contador principal (i)
+ * x2 = acumulador / contador de iteraciones
+ * --------------------------------------------------------- */
+
+/* ---------------------------------------------------------
  * Seccion de datos
  * ---------------------------------------------------------
  * Sin datos estaticos para estas funciones.
@@ -33,11 +41,11 @@ demo_for_sum_1_to_5:
     mov     x2, #0               // sum = 0
 
 for_loop:
-    cmp     x1, #5
-    b.gt    for_end
-    add     x2, x2, x1
-    add     x1, x1, #1
-    b       for_loop
+    cmp     x1, #5               // while (i <= 5)
+    b.gt    for_end              // salir si i > 5
+    add     x2, x2, x1           // sum += i
+    add     x1, x1, #1           // i++
+    b       for_loop             // repetir
 
 for_end:
     cmp     x2, #15
@@ -59,11 +67,11 @@ demo_while_even_sum:
     mov     x2, #0               // sum = 0
 
 while_check:
-    cmp     x1, #10
-    b.gt    while_end
-    add     x2, x2, x1
-    add     x1, x1, #2
-    b       while_check
+    cmp     x1, #10              // while (i <= 10)
+    b.gt    while_end            // salir si i > 10
+    add     x2, x2, x1           // sum += i
+    add     x1, x1, #2           // i += 2
+    b       while_check          // repetir
 
 while_end:
     cmp     x2, #30
@@ -85,10 +93,10 @@ demo_do_while_countdown:
     mov     x2, #0               // count = 0
 
 do_loop:
-    add     x2, x2, #1
-    sub     x1, x1, #1
-    cmp     x1, #0
-    b.ne    do_loop
+    add     x2, x2, #1           // count++
+    sub     x1, x1, #1           // i--
+    cmp     x1, #0               // while (i != 0)
+    b.ne    do_loop              // repetir
 
     cmp     x2, #5
     b.eq    demo3_ok

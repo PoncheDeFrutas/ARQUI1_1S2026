@@ -10,6 +10,16 @@
  * ========================================================= */
 
 /* ---------------------------------------------------------
+ * Registros usados en este archivo
+ * ---------------------------------------------------------
+ * x0 = codigo de retorno de cada demo (0 = ok, !=0 error)
+ * x1 = operando A / valor a comparar
+ * x2 = operando B / mascara
+ * x3 = resultado intermedio principal
+ * x4 = resultado secundario (demo 1)
+ * --------------------------------------------------------- */
+
+/* ---------------------------------------------------------
  * Seccion de datos
  * ---------------------------------------------------------
  * Sin datos estaticos para estas funciones.
@@ -26,6 +36,9 @@
 demo_add_sub_cmp:
     /* -----------------------------------------------------
      * Demo 1: add/sub + cmp + b.eq
+     *
+     * x1 = 12, x2 = 7, x3 = x1 + x2, x4 = x1 - x2
+     * Si x3 == 19, la demo pasa.
      * ----------------------------------------------------- */
     mov     x1, #12              // operando A
     mov     x2, #7               // operando B
@@ -50,8 +63,8 @@ demo_logic_tst:
      * x2 = 0b0010 (2)
      * and esperado = 0b0010 (2)
      * ----------------------------------------------------- */
-    mov     x1, #10
-    mov     x2, #2
+    mov     x1, #10              // 0b1010
+    mov     x2, #2               // 0b0010
     and     x3, x1, x2           // x3 = 2
 
     cmp     x3, #2
@@ -74,7 +87,7 @@ demo_signed_cmp:
      * -----------------------------------------------------
      * Verifica que -5 es menor que 0 usando comparacion signed.
      * ----------------------------------------------------- */
-    mov     x1, #-5
+    mov     x1, #-5              // valor signed negativo
     cmp     x1, #0
     b.lt    demo3_ok             // signed lower-than
 

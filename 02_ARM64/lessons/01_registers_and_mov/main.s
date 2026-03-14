@@ -11,6 +11,16 @@
  * ========================================================= */
 
 /* ---------------------------------------------------------
+ * Registros usados en este archivo
+ * ---------------------------------------------------------
+ * x1 = operando A
+ * x2 = operando B
+ * x3 = resultado intermedio de la suma
+ * x0 = codigo de salida para exit
+ * x8 = numero de syscall Linux ARM64
+ * --------------------------------------------------------- */
+
+/* ---------------------------------------------------------
  * Seccion de datos
  * ---------------------------------------------------------
  * Esta leccion no requiere datos estaticos en .data.
@@ -35,6 +45,8 @@ _start:
      * -----------------------------------------------------
      * El resultado queda en x3 para poder inspeccionarlo
      * en depuracion sin afectar el codigo de salida.
+     *
+     * x3 = x1 + x2
      * ----------------------------------------------------- */
     add     x3, x1, x2           // x3 = 5 + 10 = 15
 

@@ -47,6 +47,7 @@ Si la leccion usa varias demos, se recomienda:
 Cada archivo ensamblador debe seguir este formato minimo:
 
 - Cabecera de bloque con nombre de leccion, archivo, toolchain y objetivo.
+- Bloque inicial "Registros usados" indicando registro y rol.
 - Separador de `Seccion de datos` (aunque no se use, indicar que no aplica).
 - Separador de `Seccion de codigo`.
 - Bloques comentados por pasos (que se hace y por que).

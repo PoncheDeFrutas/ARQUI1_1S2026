@@ -11,6 +11,15 @@
  * ========================================================= */
 
 /* ---------------------------------------------------------
+ * Registros usados en este archivo
+ * ---------------------------------------------------------
+ * x0  = argumento 1 para sum y luego codigo de salida
+ * x1  = argumento 2 para sum
+ * x8  = numero de syscall Linux ARM64
+ * x30 = link register (retorno de bl)
+ * --------------------------------------------------------- */
+
+/* ---------------------------------------------------------
  * Seccion de datos
  * ---------------------------------------------------------
  * Esta practica no necesita datos en memoria estatica.
@@ -44,9 +53,10 @@ _start:
     bl      sum                // x0 = 15 al retornar
 
     /* -----------------------------------------------------
-     * 3) Finalizar programa con syscall exit(x0)
-     * -----------------------------------------------------
-     * Reusamos el resultado como codigo de salida.
+     * syscall: exit(x0)
+     *
+     * x0 = codigo de salida (resultado de sum)
+     * x8 = numero de syscall (93)
      * ----------------------------------------------------- */
     mov     x8, #93            // syscall exit
     svc     #0                 // llamada al kernel
