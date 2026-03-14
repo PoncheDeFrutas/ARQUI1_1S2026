@@ -53,7 +53,7 @@ Cada archivo ensamblador debe seguir este formato minimo:
 - Bloques comentados por pasos (que se hace y por que).
 - Comentarios en lineas clave (`mov`, `add`, `bl`, `svc`) con efecto en registros.
 
-Base de estilo: `../00_hello_world/main.s`.
+Base de estilo: `../00_hello_world_syscalls/main.s`.
 
 ## Flujo de trabajo
 

@@ -80,21 +80,24 @@ Al finalizar la ruta, el estudiante debe poder:
 
 ## Mapa sugerido de lecciones
 
-1. `00_hello_world`
-2. `01_registers_and_mov`
-3. `02_alu_and_flags`
-4. `03_branches_and_loops`
-5. `04_memory_load_store`
-6. `05_stack_and_functions`
-7. `06_abi_and_multifile`
-8. `07_data_types_sign_zero_extension`
-9. `08_arrays_1d`
-10. `09_matrices_indexing_2d`
-11. `10_matrix_add_sub`
-12. `11_matrix_mul_basic`
-13. `12_mixed_precision_and_fixed_point`
-14. `13_mmio_intro_gpio_foundations`
-15. `14_capstone_iot_data_pipeline`
+1. `00_hello_world_syscalls`
+2. `01_registros_y_mov`
+3. `02_cmp_y_flags_basico`
+4. `03_if_simple`
+5. `04_if_else`
+6. `05_if_elseif_else`
+7. `06_loops_while_for`
+8. `07_alu_matematica_basica`
+9. `08_alu_logica_y_bits`
+10. `09_memoria_load_store_basico`
+11. `10_stack_y_funciones`
+12. `11_abi_y_multiarchivo`
+13. `12_tipos_y_extension_signo_cero`
+14. `13_arreglos_1d`
+15. `14_matrices_indexado_2d`
+16. `15_matrices_operaciones`
+17. `16_multiplicacion_matrices_basica`
+18. `17_proyecto_iot_datos`
 
 ## Criterios minimos por leccion
 

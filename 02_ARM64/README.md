@@ -6,7 +6,7 @@ Esta seccion contiene la ruta de aprendizaje de ensamblador ARM64 del curso, ori
 
 1. Lee la [ruta formativa completa](docs/00_curriculum_path.md).
 2. Configura tu entorno con la [guia de setup y flujos](docs/01_setup_and_workflows.md).
-3. Revisa el [indice de lecciones](lessons/README.md).
+3. Revisa el [indice de lecciones](lessons/README.md) (ruta canonica 00-17 y estado de migracion).
 4. Usa la [guia de depuracion](docs/02_debugging.md) cuando ejecutes practicas.
 
 ## Documentacion por tema

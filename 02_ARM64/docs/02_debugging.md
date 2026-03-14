@@ -66,9 +66,9 @@ Edita el arreglo `inputs[0].options` para incluir la nueva carpeta de leccion. E
 
 ```json
 "options": [
-  "00_hello_world",
-  "01_registers_and_mov",
-  "02_alu_and_flags"
+  "00_hello_world_syscalls",
+  "01_registros_y_mov",
+  "02_cmp_y_flags_basico"
 ]
 ```
 

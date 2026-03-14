@@ -1,57 +1,39 @@
 # Lecciones ARM64
 
-Indice de practicas de ensamblador ARMv8 del curso.
+Indice de practicas de ensamblador ARMv8 del curso. Desde esta version se adopta una ruta canonica de 00 a 17 orientada a estudiantes con base inicial baja.
 
-## Lecciones disponibles
+## Ruta canonica (de cero a matrices)
 
-- [00_hello_world](00_hello_world/README.md)
-  Primer programa en ARM64 con syscalls (`write`, `exit`) y flujo de build basico.
+1. [00_hello_world_syscalls](00_hello_world_syscalls/README.md)
+2. [01_registros_y_mov](01_registros_y_mov/README.md)
+3. [02_cmp_y_flags_basico](02_cmp_y_flags_basico/README.md)
+4. [03_if_simple](03_if_simple/README.md)
+5. [04_if_else](04_if_else/README.md)
+6. [05_if_elseif_else](05_if_elseif_else/README.md)
+7. [06_loops_while_for](06_loops_while_for/README.md)
+8. [07_alu_matematica_basica](07_alu_matematica_basica/README.md)
+9. [08_alu_logica_y_bits](08_alu_logica_y_bits/README.md)
+10. [09_memoria_load_store_basico](09_memoria_load_store_basico/README.md)
+11. [10_stack_y_funciones](10_stack_y_funciones/README.md)
+12. [11_abi_y_multiarchivo](11_abi_y_multiarchivo/README.md)
+13. [12_tipos_y_extension_signo_cero](12_tipos_y_extension_signo_cero/README.md)
+14. [13_arreglos_1d](13_arreglos_1d/README.md)
+15. [14_matrices_indexado_2d](14_matrices_indexado_2d/README.md)
+16. [15_matrices_operaciones](15_matrices_operaciones/README.md)
+17. [16_multiplicacion_matrices_basica](16_multiplicacion_matrices_basica/README.md)
+18. [17_proyecto_iot_datos](17_proyecto_iot_datos/README.md)
 
-- [01_registers_and_mov](01_registers_and_mov/README.md)
-  Uso de registros `xN`/`wN`, carga de inmediatos con `mov` y salida por codigo de retorno.
+## Estado de migracion (primera refactorizacion)
 
-- [02_alu_and_flags](02_alu_and_flags/README.md)
-  Menu con demos de ALU/flags (`cmp`, `tst`, `b.eq`, `b.ne`, `b.lt`) en formato multiarchivo.
+- Lecciones activas implementadas en ruta canonica: `00` a `12`.
+- Lecciones `13` a `17` quedaron definidas con README base para implementacion progresiva.
+- Estructura limpia sin carpetas duplicadas en el indice principal.
 
-- [03_branches_and_loops](03_branches_and_loops/README.md)
-  Menu con demos de `for`, `while` y `do-while` usando branches condicionales.
-
-- [04_memory_load_store](04_memory_load_store/README.md)
-  Primer acceso a memoria con `.data`, `ldr`, `str` y validacion de resultados.
-
-- [05_stack_and_functions](05_stack_and_functions/README.md)
-  Llamadas a funcion con `bl/ret`, prologo/epilogo y preservacion de registros.
-
-- [06_abi_and_multifile](06_abi_and_multifile/README.md)
-  Convencion ABI entre archivos, caller/callee-saved y funciones leaf/no-leaf.
-
-- [07_data_types_sign_zero_extension](07_data_types_sign_zero_extension/README.md)
-  Demos de zero/sign extension y efecto de usar registros `wN` sobre `xN`.
-
-- `99_test`
-  Leccion de pruebas internas multiarchivo para validar flujo de ensamblado/enlace.
-
-## Plantilla estandar para nuevas lecciones
+## Plantilla estandar
 
 - [README_TEMPLATE.md](README_TEMPLATE.md)
-  Estructura base recomendada para documentar cada leccion (objetivo, prerrequisitos, comandos, checklist, errores comunes y ejercicios).
+  Estructura base recomendada para documentar cada leccion.
 
-## Ruta recomendada para nuevas lecciones
+## Notas
 
-1. 00_hello_world
-2. 01_registers_and_mov
-3. 02_alu_and_flags
-4. 03_branches_and_loops
-5. 04_memory_load_store
-6. 05_stack_and_functions
-7. 06_abi_and_multifile
-8. 07_data_types_sign_zero_extension
-9. 08_arrays_1d
-10. 09_matrices_indexing_2d
-11. 10_matrix_add_sub
-12. 11_matrix_mul_basic
-13. 12_mixed_precision_and_fixed_point
-14. 13_mmio_intro_gpio_foundations
-15. 14_capstone_iot_data_pipeline
-
-Para detalle pedagógico, revisa [../docs/00_curriculum_path.md](../docs/00_curriculum_path.md).
+- [../docs/00_curriculum_path.md](../docs/00_curriculum_path.md) contiene el detalle pedagógico por fases.
