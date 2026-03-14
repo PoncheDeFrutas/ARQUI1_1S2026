@@ -9,31 +9,34 @@ AS      = aarch64-linux-gnu-as
 LD      = aarch64-linux-gnu-ld
 QEMU    = qemu-aarch64
 
-SRC     = main.s
 BUILD   = build
-OBJ     = $(BUILD)/main.o
-BIN     = $(BUILD)/main
+TARGET  = $(BUILD)/main
+
+MAIN_SRC = main.s
+AUX_SRCS = $(filter-out $(MAIN_SRC), $(wildcard *.s))
+SRCS     = $(MAIN_SRC) $(AUX_SRCS)
+OBJS     = $(patsubst %.s,$(BUILD)/%.o,$(SRCS))
 
 ASFLAGS = -g
 LDFLAGS =
 
-all: $(BIN)
+all: $(TARGET)
 
 $(BUILD):
 	mkdir -p $(BUILD)
 
-$(OBJ): $(SRC) | $(BUILD)
+$(BUILD)/%.o: %.s | $(BUILD)
 	$(AS) $(ASFLAGS) -o $@ $<
 
-$(BIN): $(OBJ)
-	$(LD) $(LDFLAGS) -o $@ $<
+$(TARGET): $(OBJS)
+	$(LD) $(LDFLAGS) -o $@ $(OBJS)
 
-run: $(BIN)
-	$(QEMU) $(BIN)
+run: $(TARGET)
+	$(QEMU) $(TARGET)
 
-gdb: $(BIN)
+gdb: $(TARGET)
 	@echo "Starting QEMU and waiting for GDB on port 1234..."
-	$(QEMU) -g 1234 $(BIN)
+	$(QEMU) -g 1234 $(TARGET)
 
 clean:
 	rm -rf $(BUILD)

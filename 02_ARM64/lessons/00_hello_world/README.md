@@ -17,6 +17,16 @@ Ejecutar el primer programa en ensamblador AArch64 en Linux sin libc, usando sys
 - Uso de secciones `.data` y `.text`.
 - Ensamblado y enlace con `as` y `ld`.
 
+## Instrucciones y operaciones de esta leccion
+
+| Instruccion/Operacion | Que hace | Que necesita | Para que sirve |
+| --- | --- | --- | --- |
+| `mov` | Mueve inmediatos/valores entre registros | Registro destino y fuente/inmediato | Preparar argumentos de syscall |
+| `adr` | Carga la direccion de una etiqueta | Una etiqueta valida en el archivo | Obtener puntero a datos (`msg`) |
+| `svc #0` | Invoca al kernel | Numero de syscall en `x8` y argumentos en `x0-x5` | Ejecutar `write` y `exit` |
+| `write` (`x8=64`) | Escribe bytes en descriptor | `x0=fd`, `x1=buffer`, `x2=bytes` | Mostrar texto en stdout |
+| `exit` (`x8=93`) | Finaliza el proceso | `x0=codigo de salida` | Terminar programa de forma controlada |
+
 ## Archivos de la leccion
 
 ```text

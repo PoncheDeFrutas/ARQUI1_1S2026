@@ -17,6 +17,20 @@ Comprender el uso basico de registros generales (`xN` y `wN`) y mover valores en
 - Copia de valores entre registros.
 - Uso de un resultado en `x0` como codigo de salida.
 
+## Instrucciones y operaciones de esta leccion
+
+| Instruccion/Operacion | Que hace | Que necesita | Para que sirve |
+| --- | --- | --- | --- |
+| `mov xd, #imm` | Carga inmediato en 64 bits | Registro `x` destino e inmediato | Inicializar operandos y constantes |
+| `mov wd, #imm` | Carga inmediato en 32 bits | Registro `w` destino e inmediato | Practicar diferencia `xN` vs `wN` |
+| `add xd, xn, xm` | Suma dos registros | Dos registros fuente y uno destino | Construir resultados intermedios |
+| `exit` (`x8=93`) + `svc #0` | Finaliza proceso | `x0` con codigo y syscall en `x8` | Cerrar programa y devolver estado |
+
+Notas importantes:
+
+- Si escribes en `wN`, la parte alta de `xN` se limpia.
+- Para codigo de salida se usa `x0` antes de `exit`.
+
 ## Archivos de la leccion
 
 ```text

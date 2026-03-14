@@ -7,14 +7,28 @@
  * Ejecucion : qemu-aarch64
  *
  * No usa libc, solo syscalls de Linux.
- * Objetivo: controlar flujo con loops y branches.
+ * Este archivo muestra un menu para ejecutar demos.
  * ========================================================= */
 
 /* ---------------------------------------------------------
  * Seccion de datos
- * ---------------------------------------------------------
- * Esta leccion trabaja solo con registros.
  * --------------------------------------------------------- */
+.section .data
+
+menu_msg:
+    .ascii "\n[Leccion 03] Branches y loops\n"
+    .ascii "1) Demo for: suma 1..5\n"
+    .ascii "2) Demo while: suma pares 2..10\n"
+    .ascii "3) Demo do-while: countdown 5..1\n"
+    .ascii "Seleccion (1-3, Enter=1): "
+    menu_msg_len = . - menu_msg
+
+invalid_msg:
+    .ascii "Opcion invalida. Se usara codigo de error.\n"
+    invalid_msg_len = . - invalid_msg
+
+opt_buf:
+    .space 2
 
 /* ---------------------------------------------------------
  * Seccion de codigo
@@ -22,47 +36,69 @@
 .section .text
 .global _start
 
+.extern demo_for_sum_1_to_5
+.extern demo_while_even_sum
+.extern demo_do_while_countdown
+
 _start:
     /* -----------------------------------------------------
-     * 1) Inicializar contador y acumulador
-     * -----------------------------------------------------
-     * x1 = i (contador)
-     * x2 = suma acumulada
+     * 1) Mostrar menu en stdout
      * ----------------------------------------------------- */
-    mov     x1, #1               // i = 1
-    mov     x2, #0               // suma = 0
-
-loop_start:
-    /* -----------------------------------------------------
-     * 2) Cuerpo del loop: suma += i
-     * ----------------------------------------------------- */
-    add     x2, x2, x1           // suma = suma + i
-    add     x1, x1, #1           // i++
+    mov     x0, #1
+    adr     x1, menu_msg
+    mov     x2, menu_msg_len
+    mov     x8, #64
+    svc     #0
 
     /* -----------------------------------------------------
-     * 3) Condicion del loop: repetir mientras i <= 5
+     * 2) Leer opcion desde stdin
      * ----------------------------------------------------- */
-    cmp     x1, #5
-    b.le    loop_start
+    mov     x0, #0
+    adr     x1, opt_buf
+    mov     x2, #2
+    mov     x8, #63
+    svc     #0
 
-    /* -----------------------------------------------------
-     * 4) Validar resultado final
-     * -----------------------------------------------------
-     * Se espera suma = 15 (1+2+3+4+5).
-     * ----------------------------------------------------- */
-    cmp     x2, #15
-    b.eq    ok
+    cmp     x0, #0
+    b.eq    run_demo_1
 
-error:
-    mov     x0, #1               // codigo de error
+    adr     x10, opt_buf
+    ldrb    w11, [x10]
+
+    cmp     w11, #'1'
+    b.eq    run_demo_1
+    cmp     w11, #'2'
+    b.eq    run_demo_2
+    cmp     w11, #'3'
+    b.eq    run_demo_3
+    b       invalid_option
+
+run_demo_1:
+    bl      demo_for_sum_1_to_5
     b       exit_program
 
-ok:
-    mov     x0, #0               // codigo de exito
+run_demo_2:
+    bl      demo_while_even_sum
+    b       exit_program
+
+run_demo_3:
+    bl      demo_do_while_countdown
+    b       exit_program
+
+invalid_option:
+    /* -----------------------------------------------------
+     * 3) Manejo de opcion invalida
+     * ----------------------------------------------------- */
+    mov     x0, #1
+    adr     x1, invalid_msg
+    mov     x2, invalid_msg_len
+    mov     x8, #64
+    svc     #0
+    mov     x0, #9
 
 exit_program:
     /* -----------------------------------------------------
-     * 5) Finalizar programa
+     * 4) Finalizar programa con exit(x0)
      * ----------------------------------------------------- */
-    mov     x8, #93              // syscall exit
+    mov     x8, #93
     svc     #0

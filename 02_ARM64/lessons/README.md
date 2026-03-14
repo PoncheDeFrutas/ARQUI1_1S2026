@@ -11,10 +11,10 @@ Indice de practicas de ensamblador ARMv8 del curso.
   Uso de registros `xN`/`wN`, carga de inmediatos con `mov` y salida por codigo de retorno.
 
 - [02_alu_and_flags](02_alu_and_flags/README.md)
-  Operaciones de ALU (`add`, `sub`) y uso de `cmp` con banderas para control condicional.
+  Menu con demos de ALU/flags (`cmp`, `tst`, `b.eq`, `b.ne`, `b.lt`) en formato multiarchivo.
 
 - [03_branches_and_loops](03_branches_and_loops/README.md)
-  Estructuras de repeticion con contador, acumulador y branches condicionales.
+  Menu con demos de `for`, `while` y `do-while` usando branches condicionales.
 
 - [04_memory_load_store](04_memory_load_store/README.md)
   Primer acceso a memoria con `.data`, `ldr`, `str` y validacion de resultados.

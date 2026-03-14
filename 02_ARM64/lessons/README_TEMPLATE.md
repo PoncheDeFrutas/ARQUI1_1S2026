@@ -16,6 +16,16 @@ Describe en 2-4 lineas que habilidad concreta debe lograr el estudiante al final
 - Concepto 2
 - Concepto 3
 
+## Instrucciones y operaciones de esta leccion
+
+| Instruccion/Operacion | Que hace | Que necesita | Para que sirve |
+| --- | --- | --- | --- |
+| `instruccion_1` | Accion principal | Registros/flags/datos requeridos | Uso practico en la leccion |
+| `instruccion_2` | Accion principal | Registros/flags/datos requeridos | Uso practico en la leccion |
+| `instruccion_3` | Accion principal | Registros/flags/datos requeridos | Uso practico en la leccion |
+
+Opcional: agrega "otras instrucciones relacionadas" para extender practica.
+
 ## Archivos de la leccion
 
 ```text
@@ -26,6 +36,11 @@ lessons/XX_nombre_leccion/
 ```
 
 Si hay multiarchivo, agrega aqui los modulos (`algo.s`, `utils.s`, etc.) y el rol de cada uno.
+
+Si la leccion usa varias demos, se recomienda:
+
+- `main.s` como selector/menu de demos.
+- Un archivo auxiliar (`*_examples.s`) con las rutinas de cada demo.
 
 ## Estandar para archivos `.s`
 

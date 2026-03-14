@@ -17,6 +17,51 @@ Introducir acceso a memoria en ARM64 con `ldr` y `str`, diferenciando entre trab
 - Lectura y escritura en memoria con `ldr` y `str`.
 - Validacion de resultados leidos desde memoria.
 
+## Instrucciones y operaciones de esta leccion
+
+### Nucleo usado en los ejemplos
+
+| Instruccion/Operacion | Que hace | Que necesita | Para que sirve |
+| --- | --- | --- | --- |
+| `adr xd, label` | Carga direccion de etiqueta | Simbolo valido en el ensamblado | Obtener base del bloque de datos |
+| `ldr xd, [base, #offset]` | Lee 64 bits desde memoria | Base valida + offset correcto | Cargar variables al registro |
+| `str xd, [base, #offset]` | Escribe 64 bits a memoria | Base valida + offset + dato en registro | Guardar resultados calculados |
+| `add xd, xn, xm|#imm` | Opera con datos en registros | Operandos cargados previamente | Procesar valores leidos |
+| `cmp` + `b.eq` | Compara y salta si coincide | Resultado esperado y flags | Verificar correctitud de la rutina |
+
+### Que necesita cada acceso a memoria
+
+- **Base:** puntero al inicio del bloque (en esta leccion, `x10 = &a`).
+- **Offset:** desplazamiento en bytes dentro del bloque.
+- **Tamano de dato:** define la instruccion (`ldr/str` para 64 bits).
+
+### Variantes para ampliar practica
+
+- `ldrb/strb` para 8 bits.
+- `ldrh/strh` para 16 bits.
+- `ldr wN/str wN` para 32 bits.
+- Modo post-index o pre-index para recorrer buffers.
+
+## Vista visual de memoria en esta leccion
+
+En `main.s` se definen tres variables `.quad` consecutivas:
+
+```text
+Direccion base (a) = X
+
+X + 0   -> a      (8 bytes)
+X + 8   -> b      (8 bytes)
+X + 16  -> result (8 bytes)
+```
+
+Por eso el codigo usa:
+
+- `ldr x1, [x10, #0]` para leer `a`
+- `ldr x2, [x10, #8]` para leer `b`
+- `str x3, [x10, #16]` para guardar `result`
+
+Regla: como son datos de 64 bits (`.quad`), cada offset avanza de 8 en 8.
+
 ## Archivos de la leccion
 
 ```text
@@ -47,11 +92,24 @@ El programa no imprime texto y finaliza con codigo `0` cuando el resultado guard
 - Tras ejecutar las instrucciones de store, `result` vale `30`.
 - El programa termina con `exit(0)` si la comparacion es correcta.
 
+Comandos utiles en GDB para ver el ejemplo de forma visual:
+
+```gdb
+break _start
+run
+si
+info registers x10
+x/3gx $x10
+```
+
+`x/3gx $x10` muestra 3 valores de 64 bits desde la direccion base.
+
 ## Errores comunes
 
 - Cargar valor cuando en realidad querias cargar direccion.
 - Usar offset incorrecto al acceder a variables consecutivas.
 - Sobrescribir la direccion base accidentalmente.
+- Asumir que todos los tipos avanzan 8 bytes (solo aplica a `.quad`).
 
 ## Ejercicios propuestos
 
