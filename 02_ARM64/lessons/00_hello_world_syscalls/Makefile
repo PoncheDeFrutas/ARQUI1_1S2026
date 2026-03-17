@@ -1,18 +1,67 @@
-AS=aarch64-linux-gnu-as
-LD=aarch64-linux-gnu-ld
-QEMU=qemu-aarch64
-BUILD=build
+# Template: ARM64 nativo (sin QEMU) para host ARM64 – flujo mínimo
+# Copia este archivo como Makefile dentro de la lección cuando ejecutes en Raspberry Pi u otro host ARM64.
 
-all: $(BUILD)/main
+# ---------------------------------------------------------
+# Toolchain (host ARM64)
+# ---------------------------------------------------------
+AS      = as                    # o aarch64-linux-gnu-as si prefieres el prefijo
+LD      = ld
+
+# ---------------------------------------------------------
+# Paths
+# ---------------------------------------------------------
+SRC     = main.s
+BUILD   = build
+OBJ     = $(BUILD)/main.o
+BIN     = $(BUILD)/main
+
+# ---------------------------------------------------------
+# Flags
+# ---------------------------------------------------------
+ASFLAGS = -g                    # símbolos de depuración
+LDFLAGS =
+
+# ---------------------------------------------------------
+# Targets
+# ---------------------------------------------------------
+
+# Compilación por defecto
+all: $(BIN)
+
+# Crear carpeta build si no existe
 $(BUILD):
 	mkdir -p $(BUILD)
-$(BUILD)/main.o: main.s | $(BUILD)
-	$(AS) -g -o $@ $<
-$(BUILD)/main: $(BUILD)/main.o
-	$(LD) -o $@ $<
-run: $(BUILD)/main
-	$(QEMU) $(BUILD)/main
-gdb: $(BUILD)/main
-	$(QEMU) -g 1234 $(BUILD)/main
+
+# Ensamblar
+$(OBJ): $(SRC) | $(BUILD)
+	$(AS) $(ASFLAGS) -o $@ $<
+
+# Enlazar
+$(BIN): $(OBJ)
+	$(LD) $(LDFLAGS) -o $@ $<
+
+# Ejecutar directamente en host ARM64
+run: $(BIN)
+	$(BIN)
+
+# ---------------------------------------------------------
+# Debug local (sin QEMU)
+# ---------------------------------------------------------
+gdb: $(BIN)
+	gdb $(BIN)
+
+# ---------------------------------------------------------
+# Limpieza
+# ---------------------------------------------------------
 clean:
 	rm -rf $(BUILD)
+
+# ---------------------------------------------------------
+# Utilidades
+# ---------------------------------------------------------
+info:
+	@echo "Targets:"
+	@echo "  make        -> compila el programa"
+	@echo "  make run    -> ejecuta directamente en ARM64"
+	@echo "  make gdb    -> abre gdb local"
+	@echo "  make clean  -> limpia build/"

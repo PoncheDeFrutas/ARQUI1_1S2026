@@ -29,6 +29,11 @@ Indice de practicas de ensamblador ARMv8 del curso. Desde esta version se adopta
 - Lecciones `13` a `17` quedaron definidas con README base para implementacion progresiva.
 - Estructura limpia sin carpetas duplicadas en el indice principal.
 
+## Lecciones de prueba
+
+- [99_test](99_test/README.md)
+  Prueba minima de interfaz grafica en ARM64 (X11): abrir ventana y dibujar texto.
+
 ## Plantilla estandar
 
 - [README_TEMPLATE.md](README_TEMPLATE.md)
