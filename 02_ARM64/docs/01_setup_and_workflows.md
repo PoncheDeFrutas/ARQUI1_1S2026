@@ -14,6 +14,7 @@ La fuente en ensamblador es la misma en ambos casos.
 - Linux.
 - `make`.
 - VS Code + extension C/C++ (opcional para depuracion grafica).
+- Extension `StackScope` (opcional para inspeccion visual de stack y memoria).
 
 ## 3) Flujo nativo en Raspberry Pi (ARM64)
 

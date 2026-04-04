@@ -26,6 +26,9 @@
 msg:
     .ascii "Hello, world\n"     // Cadena a imprimir (sin NULL)
     msg_len = . - msg           // Longitud del mensaje
+goodbye:
+    .ascii "Goodbye, world\n"   // Nueva cadena a imprimir (sin NULL)
+    goodbye_len = . - goodbye   // Longitud de la nueva cadena
 
 /* ---------------------------------------------------------
  * Sección de código
