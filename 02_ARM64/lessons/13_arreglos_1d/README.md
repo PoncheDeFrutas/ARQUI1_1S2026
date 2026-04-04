@@ -2,50 +2,82 @@
 
 ## Objetivo de aprendizaje
 
-Modelar arreglos lineales en memoria y aplicar operaciones de alto nivel (lectura, reemplazo, insercion, eliminacion, busqueda) en ARM64.
+Representar arreglos lineales en memoria ARM64 y acceder a sus elementos usando direccionamiento base+offset. Al finalizar, el estudiante debe poder leer, reemplazar y buscar elementos en un arreglo numerico, y recorrer texto ASCII byte a byte.
 
 ## Prerrequisitos
 
 - Haber completado `../12_tipos_y_extension_signo_cero/README.md`.
-- Entender base+offset y tamano de dato.
+- Entender `adr`, `ldr`, `str`, `ldrb` y `cmp`.
+- Entender que el tamano del dato afecta el offset.
 
 ## Conceptos nuevos (3-5 maximo)
 
 - Indexado lineal: `addr = base + i * elem_size`.
-- Operaciones de arreglo numerico.
-- Operaciones de arreglo texto (ASCII).
+- Diferencia entre arreglo de `.quad` y string ASCII.
+- Busqueda lineal con loop y comparaciones.
+- Uso de `lsl #3` para multiplicar un indice por 8.
 
 ## Instrucciones y operaciones de esta leccion
 
 | Instruccion/Operacion | Que hace | Que necesita | Para que sirve |
 | --- | --- | --- | --- |
-| `ldr/str` por indice | Lee/escribe elemento | Base, indice, offset | Reemplazar datos |
-| `add/sub` en loops | Mueve datos por corrimiento | Contador y limites | Insertar/eliminar |
-| `cmp` + branches | Controla busqueda/limites | Valores y flags | Validar posicion/capacidad |
-| `ldrb/strb` | Maneja texto byte a byte | Buffer ASCII | Operaciones en cadenas |
+| `adr xD, label` | Carga direccion base del arreglo | Etiqueta valida | Obtener base de datos |
+| `ldr/str` con offset calculado | Lee o escribe un `.quad` | Base y offset en bytes | Acceso por indice a enteros |
+| `ldrb` | Lee un byte ASCII | Base de string e indice | Recorrer texto caracter por caracter |
+| `lsl #3` | Multiplica indice por 8 | Indice entero | Calcular offset para `quad` |
+| `cmp` + branches | Controla busqueda y validacion | Valores y flags | Verificar resultados y limites |
 
 ## Archivos de la leccion
 
 ```text
 lessons/13_arreglos_1d/
 |- README.md
-|- main.s                (pendiente)
-|- array_int_examples.s  (pendiente)
-|- array_text_examples.s (pendiente)
-`- Makefile              (pendiente)
+|- main.s
+|- array_int_examples.s
+|- array_text_examples.s
+`- Makefile
 ```
 
-## Estado actual
-
-Leccion planificada para siguiente iteracion de implementacion.
+- `main.s`: muestra menu y llama la demo elegida.
+- `array_int_examples.s`: demos con arreglos de enteros.
+- `array_text_examples.s`: demo con texto ASCII.
 
 ## Estandar para archivos `.s`
 
-Cuando se implemente, `main.s` y modulos auxiliares deben seguir el formato canonico del curso: cabecera completa, registros usados, secciones de datos/codigo y comentarios linea por linea en instrucciones clave.
+Todos los archivos siguen el formato canonico del curso: cabecera, registros usados, seccion de datos, seccion de codigo y comentarios por bloque en cada instruccion critica.
+
+## Como pensar un arreglo 1D en ARM64
+
+Un arreglo no es mas que una zona continua de memoria.
+
+Si el arreglo contiene enteros de 64 bits:
+
+- cada elemento ocupa 8 bytes;
+- `arr[0]` esta en `base + 0`;
+- `arr[1]` esta en `base + 8`;
+- `arr[2]` esta en `base + 16`.
+
+Por eso la formula general es:
+
+```text
+direccion = base + indice * tamano_elemento
+```
+
+En esta leccion:
+
+- para enteros `.quad`, `tamano_elemento = 8`;
+- para texto ASCII, `tamano_elemento = 1`.
+
+## Demos incluidas
+
+1. Leer `arr[2]` de un arreglo numerico y validar que vale `9`.
+2. Reemplazar `arr[1]` por `99` y releerlo desde memoria.
+3. Buscar `15` en un arreglo y verificar tambien el caso no encontrado con `7`.
+4. Recorrer la palabra `banana` y contar cuantas veces aparece `'a'`.
 
 ## Flujo de trabajo
 
-Cuando la leccion este implementada:
+Desde el directorio de la leccion:
 
 ```bash
 make
@@ -55,32 +87,41 @@ make gdb
 
 ## Salida esperada
 
-Mostrara menu de operaciones sobre arreglos numericos y texto.
+```text
+1) leer arr[2]
+2) reemplazar arr[1]
+3) buscar valor
+4) contar 'a' en banana
+Seleccion (1-4):
+```
+
+Cada opcion valida internamente el resultado y termina con `exit(0)` si todo esta correcto.
 
 ## Verificacion (checklist)
 
-- Reemplazo por indice correcto.
-- Insercion/desplazamiento sin perder datos.
-- Eliminacion con corrimiento correcto.
-- Busqueda retorna posicion correcta.
+- Opcion 1 calcula `base + 2*8` y relee `9`.
+- Opcion 2 escribe `99` en el segundo elemento sin alterar los vecinos.
+- Opcion 3 encuentra `15` en la posicion `2` y retorna no encontrado para `7`.
+- Opcion 4 recorre el texto byte a byte y cuenta `3` apariciones de `'a'`.
 
 ## Errores comunes
 
-- Off-by-one en limites.
-- Desbordar capacidad del arreglo.
-- Confundir bytes de texto con enteros de 32/64 bits.
+- Olvidar multiplicar el indice por el tamano del dato.
+- Tratar un string como si cada elemento ocupara 8 bytes.
+- Perder el caso de salida en una busqueda lineal.
+- Confundir indice con offset en bytes.
 
 ## Ejercicios propuestos
 
-1. Insertar elemento en posicion intermedia.
-2. Eliminar primera y ultima posicion.
-3. Buscar caracter en string y retornar indice.
+1. Agrega una demo que sume todos los elementos de un arreglo `quad`.
+2. Modifica la busqueda para retornar `-1` explicitamente en `x0`.
+3. Cuenta otra letra en `banana` y valida el nuevo resultado.
 
 ## Criterios de evaluacion sugeridos
 
-- **Correctitud:** operaciones mantienen integridad del arreglo.
-- **Direccionamiento:** offsets correctos segun tipo.
-- **Depuracion:** trazas claras de corrimientos.
+- **Correctitud:** cada demo produce el resultado esperado.
+- **Direccionamiento:** los offsets usados coinciden con el tamano del elemento.
+- **Lectura de memoria:** el estudiante puede explicar por que `arr[i]` cambia de direccion.
 
 ## Proxima leccion
 

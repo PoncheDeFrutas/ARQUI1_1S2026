@@ -2,48 +2,75 @@
 
 ## Objetivo de aprendizaje
 
-Entender representacion de matrices en memoria lineal y aplicar formulas de direccionamiento en row-major y column-major.
+Entender que una matriz 2D en ARM64 sigue almacenandose como memoria lineal, y aprender a calcular la direccion de `A[i][j]` en los layouts row-major y column-major.
 
 ## Prerrequisitos
 
 - Haber completado `../13_arreglos_1d/README.md`.
-- Entender multiplicacion por `elem_size`.
+- Entender `mul`, `add`, `ldr`, `str` y multiplicacion por `elem_size`.
+- Entender arreglos lineales de `.quad`.
 
 ## Conceptos nuevos (3-5 maximo)
 
 - Layout row-major.
 - Layout column-major.
-- Formula de acceso `A[i][j]`.
+- Formula de direccionamiento para `A[i][j]`.
+- Validacion basica de limites (`i < rows`, `j < cols`).
 
 ## Instrucciones y operaciones de esta leccion
 
 | Instruccion/Operacion | Que hace | Que necesita | Para que sirve |
 | --- | --- | --- | --- |
-| `mul` | Calcula indice lineal parcial | `i`, `cols/rows` | Construir offset 2D |
-| `add` | Combina indice y base | Offset y base | Obtener direccion final |
-| `ldr/str` | Lee/escribe elemento matriz | Direccion calculada | Operar matriz |
-| `cmp` + bounds | Verifica limites | `i`,`j`,`rows`,`cols` | Evitar accesos invalidos |
+| `mul` | Construye parte del indice lineal | `i`, `j`, `rows`, `cols` | Calcular offset 2D |
+| `add` | Suma base, indices y offset | Base y temporales | Obtener direccion final |
+| `ldr/str` | Lee o escribe una celda | Direccion valida | Acceder elementos de matriz |
+| `cmp` + `b.hs` | Verifica limites | `i`, `j`, `rows`, `cols` | Detectar accesos invalidos |
+| `lsl #3` | Multiplica por 8 bytes | Indice lineal | Convertir indice a offset de `.quad` |
 
 ## Archivos de la leccion
 
 ```text
 lessons/14_matrices_indexado_2d/
 |- README.md
-|- main.s                       (pendiente)
-|- matrix_row_major_examples.s  (pendiente)
-|- matrix_col_major_examples.s  (pendiente)
-`- Makefile                     (pendiente)
+|- main.s
+|- matrix_row_major_examples.s
+|- matrix_col_major_examples.s
+`- Makefile
 ```
 
-## Estado actual
+- `main.s`: menu para elegir la demo.
+- `matrix_row_major_examples.s`: lectura y escritura en row-major.
+- `matrix_col_major_examples.s`: lectura en column-major y validacion de limites.
 
-Leccion planificada para iteracion posterior.
+## Como se adapta una matriz a memoria lineal
 
-## Estandar para archivos `.s`
+Una matriz no se guarda como "filas y columnas" separadas en memoria. Se guarda como una secuencia lineal.
 
-Los modulos de matrices deben usar el mismo estandar de comentarios del curso para dejar explicito como se calculan offsets y direcciones.
+Para una matriz `rows x cols` de elementos `.quad`:
+
+- cada elemento ocupa 8 bytes;
+- primero se calcula el indice lineal;
+- despues se convierte a bytes multiplicando por `8`.
+
+Formulas de esta leccion:
+
+```text
+row-major:    offset = (i * cols + j) * 8
+column-major: offset = (j * rows + i) * 8
+```
+
+La diferencia esta en que row-major agrupa por filas y column-major agrupa por columnas.
+
+## Demos incluidas
+
+1. Leer `A[1][2]` en una matriz `2x3` row-major y validar que el valor es `60`.
+2. Leer el mismo `A[1][2]` en una matriz equivalente almacenada en column-major.
+3. Escribir `99` en `A[1][1]` row-major y releer la posicion.
+4. Detectar un acceso fuera de rango antes de calcular la direccion.
 
 ## Flujo de trabajo
+
+Desde el directorio de la leccion:
 
 ```bash
 make
@@ -51,35 +78,43 @@ make run
 make gdb
 ```
 
-(Disponible cuando se implemente el codigo.)
-
 ## Salida esperada
 
-Menu con demos de acceso a matriz en row-major y column-major.
+```text
+1) leer A[1][2] row-major
+2) leer A[1][2] column-major
+3) escribir A[1][1] row-major
+4) validar limites
+Seleccion (1-4):
+```
+
+Cada opcion valida internamente el resultado y termina con `exit(0)` si el calculo es correcto.
 
 ## Verificacion (checklist)
 
-- `addr(i,j)` coincide con valor esperado.
-- Diferencia entre row-major y column-major clara.
-- Accesos fuera de rango detectados en validacion.
+- Opcion 1 usa `offset = (1*3 + 2) * 8` y obtiene `60`.
+- Opcion 2 usa `offset = (2*2 + 1) * 8` y tambien obtiene `60`.
+- Opcion 3 escribe `99` solo en la celda objetivo.
+- Opcion 4 detecta que `i = 2` es invalido para `rows = 2`.
 
 ## Errores comunes
 
-- Intercambiar `rows` y `cols` en formula.
-- Olvidar multiplicar por `elem_size`.
-- Reusar indice lineal de layout equivocado.
+- Intercambiar `rows` con `cols` al construir el indice lineal.
+- Olvidar multiplicar el indice lineal por 8 para `.quad`.
+- Usar formula row-major sobre datos guardados en column-major.
+- Validar limites despues de acceder a memoria en vez de antes.
 
 ## Ejercicios propuestos
 
-1. Calcular y validar `addr(1,2)` en ambos layouts.
-2. Leer diagonal principal de matriz cuadrada.
-3. Implementar escritura segura con verificacion de limites.
+1. Cambia la posicion objetivo a `A[0][1]` y recalcula el offset.
+2. Agrega lectura de la diagonal principal en una matriz `2x2`.
+3. Implementa escritura segura en column-major.
 
 ## Criterios de evaluacion sugeridos
 
-- **Correctitud:** direccionamiento 2D correcto.
-- **Modelo mental:** diferencia clara de layouts.
-- **Depuracion:** inspeccion de direcciones calculadas.
+- **Correctitud:** las direcciones calculadas producen la celda esperada.
+- **Modelo mental:** el estudiante puede explicar la diferencia entre ambos layouts.
+- **Depuracion:** puede rastrear `i`, `j`, indice lineal y offset en bytes.
 
 ## Proxima leccion
 
