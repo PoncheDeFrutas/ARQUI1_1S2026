@@ -37,14 +37,11 @@ def main():
     client = get_client()
     collection = client[db_name][col_name]
 
-    id = 0
-
     while True:
-        doc = {"sensor": f"raspi-{id:02d}", "temp": round(random.uniform(20, 30), 1), "hum": random.randint(40, 70), "room": "lab"}
+        doc = {"sensor": f"raspi", "temp": round(random.uniform(20, 30), 1), "hum": random.randint(40, 70), "room": "lab"}
         collection.insert_one(doc)
         time.sleep(1)
         print(f"Documento insertado: {doc}")
-        id += 1
 
 if __name__ == "__main__":
     main()
