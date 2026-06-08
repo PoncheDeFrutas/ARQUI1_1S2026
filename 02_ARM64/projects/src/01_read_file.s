@@ -53,30 +53,16 @@ read_loop:
     // Guardar el número de bytes leídos en x20
     mov x20, x0
 
-    ldr x21, =buffer     // Dirección del buffer
-    mov x22, x20         // Cantidad de bytes leídos
-
-process_buffer:
-    cbz x22, read_loop   // si ya no tenemos bytes, volvemos aleer
-
-    // Leermos el contenido de la dirrecion y avanzamos en una el puntero (x21)
-    ldrb w23, [x21, #0]   // Cargar el byte actual en w23
-    add x21, x21, #1     // Avanzar el puntero del
-
-    // Si es $ finalizamos la rectura
-    cmp w23, '$'
-    beq close_file
-
-    // imprimir el caracter
-    // write(STDOUT, x21, 1)
+    // IRA CAMBIANDO SEGUN NECESIDADES
+    // write(STDOUT, buffer, x20)
     mov x0, #1          // STDOUT
-    mov x1, x21         // Dirección del caracter (ya avanzamos el puntero)
-    mov x2, #1          // Cantidad de bytes a escribir
+    ldr x1, =buffer     // Dirección del buffer
+    mov x2, x20         // Cantidad de bytes leídos
     mov x8, #64         // syscall write
     svc #0
 
-    sub x22, x22, #1     // Decrementamos el contador de bytes leídos
-    b process_buffer     // Volvemos a procesar el buffer
+    b read_loop
+
 
 open_error:
     mov x0, #1          // STDOUT
