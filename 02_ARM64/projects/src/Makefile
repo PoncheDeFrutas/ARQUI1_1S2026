@@ -1,76 +1,55 @@
-# Template: ARM64 en host x86 y x64 con QEMU (flujo multi-fuente)
-# Copia este archivo como Makefile dentro de la lección.
+# ARM64 + QEMU
+# Compila un archivo raiz y deja las dependencias entre archivos a .include.
 
-# ----------------------------------------------------------
-# Toolchain (compilación cruzada AArch64)
-# ----------------------------------------------------------
 AS      = aarch64-linux-gnu-as
 LD      = aarch64-linux-gnu-ld
 QEMU    = qemu-aarch64
 
-# ----------------------------------------------------------
-# Rutas y nombres de salida
-# ----------------------------------------------------------
-BUILD   = build
-TARGET  = $(BUILD)/main
+BUILD   ?= build
+SRC     ?= main.s
+GDB_PORT ?= 1234
 
-# ----------------------------------------------------------
-# Fuentes
-# ----------------------------------------------------------
-MAIN_SRC = main.s
-AUX_SRCS = $(filter-out $(MAIN_SRC), $(wildcard *.s))
-SRCS     = $(MAIN_SRC) $(AUX_SRCS)
-OBJS     = $(patsubst %.s,$(BUILD)/%.o,$(SRCS))
+PROGRAM := $(basename $(notdir $(SRC)))
+OBJ     := $(BUILD)/$(PROGRAM).o
+TARGET  := $(BUILD)/$(PROGRAM)
 
-# ----------------------------------------------------------
-# Flags
-# ----------------------------------------------------------
-ASFLAGS = -g
-LDFLAGS =
+ASFLAGS ?= -g -I .
+LDFLAGS ?=
 
-# ----------------------------------------------------------
-# Targets principales
-# ----------------------------------------------------------
+.PHONY: all run gdb gdb-vscode clean info
 
 all: $(TARGET)
 
-# Crear el directorio build si no existe
 $(BUILD):
 	mkdir -p $(BUILD)
 
-# Ensamblado de cualquier archivo .s a .o
-$(BUILD)/%.o: %.s | $(BUILD)
-	$(AS) $(ASFLAGS) -o $@ $<
+# El archivo indicado en SRC es el punto de entrada del programa.
+# Si necesita codigo de otros archivos, usar por ejemplo:
+#   .include "01_read_file.s"
+$(OBJ): $(SRC) $(wildcard *.s) | $(BUILD)
+	$(AS) $(ASFLAGS) -o $@ $(SRC)
 
-# Enlazado final
-$(TARGET): $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $(OBJS)
+$(TARGET): $(OBJ)
+	$(LD) $(LDFLAGS) -o $@ $<
 
-# ----------------------------------------------------------
-# Ejecución (QEMU)
-# ----------------------------------------------------------
 run: $(TARGET)
 	$(QEMU) $(TARGET)
 
-# ----------------------------------------------------------
-# Depuración (QEMU + GDB remoto)
-# ----------------------------------------------------------
 gdb: $(TARGET)
-	@echo "Starting QEMU and waiting for GDB on port 1234..."
-	$(QEMU) -g 1234 $(TARGET)
+	@echo "Starting QEMU and waiting for GDB on port $(GDB_PORT)..."
+	$(QEMU) -g $(GDB_PORT) $(TARGET)
 
-# ----------------------------------------------------------
-# Limpieza
-# ----------------------------------------------------------
+gdb-vscode: $(TARGET)
+	@echo "Starting QEMU and waiting for GDB on port $(GDB_PORT)..."
+	@$(QEMU) -g $(GDB_PORT) $(TARGET) & pid=$$!; echo $$pid > $(BUILD)/qemu.pid; sleep 0.2; if kill -0 $$pid 2>/dev/null; then echo "QEMU_GDB_READY"; fi; wait $$pid
+
 clean:
 	rm -rf $(BUILD)
 
-# ----------------------------------------------------------
-# Información de ayuda
-# ----------------------------------------------------------
 info:
-	@echo "Targets disponibles:"
-	@echo "  make        -> ensambla y enlaza el programa ARM64"
-	@echo "  make run    -> ejecuta el binario en QEMU"
-	@echo "  make gdb    -> ejecuta QEMU y espera conexión de GDB (VS Code)"
-	@echo "  make clean  -> elimina el directorio build/"
+	@echo "Uso:"
+	@echo "  make                         -> compila main.s"
+	@echo "  make SRC=archivo.s           -> compila build/archivo"
+	@echo "  make SRC=archivo.s run       -> ejecuta con qemu-aarch64"
+	@echo "  make SRC=archivo.s gdb       -> espera GDB en el puerto $(GDB_PORT)"
+	@echo "  make SRC=archivo.s clean     -> limpia build/"
