@@ -19,6 +19,9 @@ class Sensors:
             self.read_dht11()
             self.last_read_time_dht = tiempo_actual
 
+         if tiempo_actual - self.last_read_time_dht >= self.read_interval_dht:
+            self.read_arduino()
+
         # Lectura de otros sensores aquí (p.ej. MQ-135)
 
 

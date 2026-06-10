@@ -72,6 +72,5 @@ def main():
     except KeyboardInterrupt:
         print("\nSimulador detenido.")
 
-
 if __name__ == "__main__":
     main()
