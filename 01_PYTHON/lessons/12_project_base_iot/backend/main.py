@@ -1,9 +1,10 @@
 import csv
 import os
+import subprocess
 from pathlib import Path
 
 from dotenv import load_dotenv
-from flask import Flask, jsonify, send_file
+from flask import Flask, jsonify, request
 from pymongo import DESCENDING
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -16,38 +17,15 @@ MONGODB_URI = os.getenv("MONGODB_URI")
 MONGODB_DB = os.getenv("MONGODB_DB")
 MONGODB_COLLECTION = os.getenv("MONGODB_COLLECTION")
 
-CSV_PATH = Path("lecturas.csv")
+CSV_PATH = Path("src/lecturas.csv")
 
 
 def get_collection():
-    if not MONGODB_URI:
-        raise RuntimeError("Falta MONGODB_URI en .env")
-
-    if not MONGODB_DB:
-        raise RuntimeError("Falta MONGODB_DB en .env")
-
-    if not MONGODB_COLLECTION:
-        raise RuntimeError("Falta MONGODB_COLLECTION en .env")
-
     client = MongoClient(MONGODB_URI, server_api=ServerApi("1"))
     return client[MONGODB_DB][MONGODB_COLLECTION]
 
 
-def normalizar_documento(doc, index):
-    return {
-        "ID": index,
-        "TEMP": int(doc.get("temperatura", 0)),
-        "HUM_AIRE": int(doc.get("humedad", 0)),
-        "HUM_SUELO_1": int(doc.get("hum_suelo_1", 0)),
-        "HUM_SUELO_2": int(doc.get("hum_suelo_2", 0)),
-        "LUZ": int(doc.get("luz", 0)),
-        "GAS": int(doc.get("gas_ppm", 0)),
-        "RIEGO_1": int(doc.get("riego_1", 0)),
-        "RIEGO_2": int(doc.get("riego_2", 0)),
-    }
-
-
-def crear_csv_ultimos_30():
+def crear_csv():
     collection = get_collection()
 
     documentos = list(
@@ -58,28 +36,39 @@ def crear_csv_ultimos_30():
 
     documentos.reverse()
 
-    columnas = [
-        "ID",
-        "TEMP",
-        "HUM_AIRE",
-        "HUM_SUELO_1",
-        "HUM_SUELO_2",
-        "LUZ",
-        "GAS",
-        "RIEGO_1",
-        "RIEGO_2",
-    ]
+    CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     with CSV_PATH.open("w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=columnas)
-        writer.writeheader()
+        writer = csv.writer(file)
+
+        writer.writerow([
+            "ID",
+            "TEMP",
+            "HUM_AIRE",
+            "HUM_SUELO_1",
+            "HUM_SUELO_2",
+            "LUZ",
+            "GAS",
+            "RIEGO_1",
+            "RIEGO_2",
+        ])
 
         for index, doc in enumerate(documentos, start=1):
-            writer.writerow(normalizar_documento(doc, index))
+            writer.writerow([
+                index,
+                int(doc.get("temperatura", 0)),
+                int(doc.get("humedad", 0)),
+                int(doc.get("hum_suelo_1", 0)),
+                int(doc.get("hum_suelo_2", 0)),
+                int(doc.get("luz", 0)),
+                int(doc.get("gas_ppm", 0)),
+                int(doc.get("riego_1", 0)),
+                int(doc.get("riego_2", 0)),
+            ])
 
         file.write("$\n")
 
-    return CSV_PATH, len(documentos)
+    return len(documentos)
 
 
 @app.route("/")
@@ -87,24 +76,38 @@ def home():
     return "Si estoy vivo"
 
 
-@app.route("/api/generar-csv", methods=["GET"])
-def generar_csv():
+@app.route("/api/analizar", methods=["POST"])
+def analizar():
     try:
-        path, total = crear_csv_ultimos_30()
+        columna = request.get_data(as_text=True).strip()
+
+        if not columna.isdigit():
+            return jsonify({
+                "error": "Debe enviar solo el número de columna"
+            }), 400
+
+        total = crear_csv()
+
+        result = subprocess.run(
+            ["./build/main", columna],
+            cwd="src",
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
 
         return jsonify({
-            "mensaje": "CSV generado correctamente",
-            "archivo": str(path),
-            "total_documentos": total
+            "columna": int(columna),
+            "documentos": total,
+            "salida": result.stdout.strip(),
+            "error": result.stderr.strip(),
+            "codigo": result.returncode
         })
 
     except Exception as exc:
         return jsonify({
-            "mensaje": "Error al generar CSV",
             "error": str(exc)
         }), 500
-
-def analizar_csv():
 
 
 if __name__ == "__main__":
