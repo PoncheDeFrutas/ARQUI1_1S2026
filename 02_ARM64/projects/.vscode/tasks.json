@@ -20,6 +20,19 @@
             "command": "make",
             "args": [
                 "SRC=${fileBasename}",
+                "run"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "ARM64: run archivo activo con parametros",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "SRC=${fileBasename}",
                 "ARGS=${input:columna}",
                 "run"
             ],
@@ -30,6 +43,30 @@
         },
         {
             "label": "ARM64: build + gdb archivo activo",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "SRC=${fileBasename}",
+                "gdb-vscode"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "arm64-qemu",
+                "pattern": {
+                    "regexp": "a^"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^Starting QEMU",
+                    "endsPattern": "^QEMU_GDB_READY$"
+                }
+            }
+        },
+        {
+            "label": "ARM64: build + gdb archivo activo con parametros",
             "type": "shell",
             "command": "make",
             "args": [

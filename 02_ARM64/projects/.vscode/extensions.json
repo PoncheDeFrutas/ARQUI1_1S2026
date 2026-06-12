@@ -3,6 +3,6 @@
     "ms-vscode.cpptools",
     "ms-vscode.makefile-tools",
     "EightLayerStudio.StackScope",
-    "mkornelsen.vscode-arm64",
+    "mkornelsen.vscode-arm64"
   ]
 }
