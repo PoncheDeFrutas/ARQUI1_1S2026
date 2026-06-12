@@ -1,6 +1,4 @@
 {
-  "cSpell.enabled": false,
-  "cSpell.language": "en,es-ES",
   "debug.allowBreakpointsEverywhere": true,
   "terminal.integrated.cwd": "${fileDirname}"
 }
