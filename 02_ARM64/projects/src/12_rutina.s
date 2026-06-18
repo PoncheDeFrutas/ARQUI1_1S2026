@@ -62,17 +62,19 @@ sum_loop:
     ldr x10, [x24]
     add x28, x28, x10
 
+    // corrimiento en el stack
+    add x24, x24, #16
+
     b sum_loop
 
 print_result:
-    lsl x28, x28, #1
-
     mov x0, #1
     ldr x1, =msg_result
     mov x2, msg_result_len
     mov x8, #64
     svc #0
 
+    //mover resultado a x0
     mov x0, x28
     bl print_uint
 
@@ -81,8 +83,6 @@ print_result:
     mov x2, #1
     mov x8, #64
     svc #0
-
-    mov sp, x27
 
     b exit_ok
 
@@ -96,9 +96,6 @@ no_argumento:
     b exit_error
 
 print_uint:
-    stp x29, x30, [sp, #-16]!
-    mov x29, sp
-
     ldr x1, =num_buffer
     add x1, x1, #31
     mov w2, #0
@@ -136,7 +133,6 @@ write_number:
     mov x8, #64
     svc #0
 
-    ldp x29, x30, [sp], #16
     ret
 
 exit_ok:
