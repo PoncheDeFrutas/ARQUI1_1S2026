@@ -1,13 +1,3 @@
-// 10_atoi_csv.s
-//
-// Entrada:
-//   x21 = puntero actual dentro del buffer
-//   x5  = base 10
-//
-// Salida:
-//   x10 = numero convertido
-//   x7  = 1 si leyo al menos un digito
-//   w23 = delimitador encontrado
 
 atoi_csv:
     mov x10, #0             // resultado = 0
