@@ -98,6 +98,7 @@ no_argumento:
 print_uint:
     ldr x1, =num_buffer
     add x1, x1, #31
+
     mov w2, #0
     strb w2, [x1]
 
@@ -107,11 +108,13 @@ print_uint:
     cmp x0, #0
     bne convert_loop
 
+    // guardan en caso es 0
     sub x1, x1, #1
     mov w2, '0'
     strb w2, [x1]
     mov x4, #1
     b write_number
+
 
 convert_loop:
     udiv x5, x0, x3
