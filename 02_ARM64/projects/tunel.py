@@ -12,6 +12,8 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "*")
 CORS(app, resources={
     r"/*": {
         "origins": FRONTEND_URL
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "ngrok-skip-browser-warning"]
     }
 })
 
