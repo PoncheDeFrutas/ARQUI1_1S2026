@@ -11,24 +11,21 @@ proceso = subprocess.Popen(
     bufsize=1
 )
 
+try:
+    while True:
+        linea = ",".join(str(random.randint(0, 100)) for _ in range(2))
 
-datos = []
-for _ in range(100):
-    a = random.randint(1, 100)
-    b = random.randint(1, 100)
-    datos.append(f"{a},{b}")
+        print(f"Python envia: {linea}")
 
+        proceso.stdin.write(linea + "\n")
+        proceso.stdin.flush()
 
-for linea in datos:
-    print(f"Python envia: {linea}")
+        respuesta = proceso.stdout.readline().strip()
+        print(f"ARM64 responde: {respuesta}")
+        time.sleep(1)
+except KeyboardInterrupt:
+    print("Interrupción del usuario. Cerrando el proceso...")
+    # cerrar comunicacion al final
+    proceso.stdin.close()
+    proceso.wait()
 
-    proceso.stdin.write(linea + "\n")
-    proceso.stdin.flush()
-
-    respuesta = proceso.stdout.readline().strip()
-    print(f"ARM64 responde: {respuesta}")
-    time.sleep(1)
-
-# cerrar comunicacion al final
-proceso.stdin.close()
-proceso.wait()
