@@ -47,11 +47,15 @@ main_loop:
     cmp w0, 'n'
     beq exit_ok
 
+    // SECCION A EDITAR
+
     bl atoi_csv
 
     cbz x7, print_error
 
     mov x24, x10     // el primer numero (temperatura)
+    // ldr x3, =array_temperatura
+    // bl guardar_dato
 
     bl atoi_csv
 
@@ -59,6 +63,9 @@ main_loop:
 
     // suma de los 2 valores = 20,10 => 20+10 = 30
     add x0, x24, x10
+
+    // FIN DE SECCION A EDITAR
+
 
     bl print_uint
 
