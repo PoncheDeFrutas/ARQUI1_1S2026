@@ -52,6 +52,12 @@
             "options": {
                 "cwd": "${fileDirname}"
             },
+            "presentation": {
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "clear": true
+            },
             "isBackground": true,
             "problemMatcher": {
                 "owner": "arm64-qemu",
@@ -76,6 +82,12 @@
             ],
             "options": {
                 "cwd": "${fileDirname}"
+            },
+            "presentation": {
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "clear": true
             },
             "isBackground": true,
             "problemMatcher": {
