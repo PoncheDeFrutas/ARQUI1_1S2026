@@ -56,14 +56,23 @@ main_loop:
     ldr x3, =temp_array
     bl guardar_dato
 
+    // IR GUARDAN SECUENCIALMENTE TODOS
+    // LOS DATOS EN LOS ARRAY /TEMP /HUM /...
+
+
+    // calcular el promedio de cada array
     // calcular promedio
     // del array
+    // x3 = direccion del array
+    // x2 = cantidad de elementos en el array
     bl calcular_promedio
 
     // comparar con temp_ideal
     ldr x0, =temp_ideal
     ldr x0, [x0]
 
+    // VER QUE ACCION SE HACE CON CADA VALIDACION ( ustes tienen 2)
+    // promedio la tendencia y amplitud
     // ver accion a tomar
     cmp x13, x0
     bgt imprimir_led_on
