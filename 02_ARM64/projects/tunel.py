@@ -31,6 +31,13 @@ def health():
         "service": "raspberry-backend"
     })
 
+@app.route("/ejemplo")
+def saludo():
+    return jsonify({
+        "saludo": "hola"
+    })
+
+
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
