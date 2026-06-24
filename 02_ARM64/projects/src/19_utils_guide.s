@@ -14,11 +14,11 @@ err_read:
 
 .balign 8
 start_line:
-    .quad 1          // primera linea de datos
+    .quad 4          // primera linea de datos
 
 .balign 8
 end_line:
-    .quad 2          // ultima linea de datos
+    .quad 8          // ultima linea de datos
 
 .bss
 
